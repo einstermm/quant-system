@@ -1,0 +1,9 @@
+strategy_id: btc_trend_v1
+symbol: BTC-USDT
+timeframe: 1h
+signal:
+  type: moving_average_trend
+  fast_window: 24
+  slow_window: 120
+execution:
+  mode: paper

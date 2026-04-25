@@ -1,0 +1,9 @@
+strategy_id: grid_filter_v1
+symbol: BTC-USDT
+timeframe: 15m
+regime_filter:
+  avoid_high_volatility: true
+  min_range_score: "0.50"
+execution:
+  mode: paper
+  hummingbot_executor: grid

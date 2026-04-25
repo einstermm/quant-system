@@ -1,0 +1,16 @@
+strategy_id: crypto_momentum_v1
+universe:
+  exchange: binance
+  market_type: spot
+  quote_asset: USDT
+  symbols:
+    - BTC-USDT
+    - ETH-USDT
+timeframe: 1h
+signal:
+  type: moving_average_trend
+  fast_window: 24
+  slow_window: 96
+execution:
+  mode: paper
+  policy: market_order
