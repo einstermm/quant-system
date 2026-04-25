@@ -75,6 +75,55 @@ class Candle:
 
 
 @dataclass(frozen=True, slots=True)
+class FundingRate:
+    exchange: str
+    trading_pair: str
+    interval: str
+    timestamp: datetime
+    rate: Decimal
+
+    def __post_init__(self) -> None:
+        if not Decimal("-1") <= self.rate <= Decimal("1"):
+            raise ValueError("funding rate must be between -1 and 1")
+
+
+@dataclass(frozen=True, slots=True)
+class OrderBookLevel:
+    price: Decimal
+    quantity: Decimal
+
+    def __post_init__(self) -> None:
+        require_positive(self.price, "price")
+        require_positive(self.quantity, "quantity")
+
+
+@dataclass(frozen=True, slots=True)
+class OrderBookSnapshot:
+    exchange: str
+    trading_pair: str
+    timestamp: datetime
+    bids: tuple[OrderBookLevel, ...]
+    asks: tuple[OrderBookLevel, ...]
+
+    def __post_init__(self) -> None:
+        if not self.bids:
+            raise ValueError("bids cannot be empty")
+        if not self.asks:
+            raise ValueError("asks cannot be empty")
+
+        for previous, current in zip(self.bids, self.bids[1:]):
+            if previous.price < current.price:
+                raise ValueError("bids must be sorted by descending price")
+
+        for previous, current in zip(self.asks, self.asks[1:]):
+            if previous.price > current.price:
+                raise ValueError("asks must be sorted by ascending price")
+
+        if self.bids[0].price >= self.asks[0].price:
+            raise ValueError("best bid must be lower than best ask")
+
+
+@dataclass(frozen=True, slots=True)
 class Signal:
     strategy_id: str
     symbol: str

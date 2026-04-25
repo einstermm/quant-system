@@ -40,6 +40,14 @@ Hummingbot 直接承担：
 ./venv/bin/python -m unittest discover -s tests
 ```
 
+## Phase 2 数据导入示例
+
+```bash
+./venv/bin/python -m packages.data.import_candles \
+  --input data/samples/binance_1h_candles.csv \
+  --quality-report /tmp/quant-system-data-quality.json
+```
+
 ## 下一步
 
 1. 先完成 `packages/core`、`packages/risk`、`packages/execution` 的接口稳定。
