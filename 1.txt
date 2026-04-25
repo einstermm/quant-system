@@ -1,0 +1,157 @@
+quant-system/
+│
+├── README.md
+├── pyproject.toml
+├── docker-compose.yml
+├── .env.example
+│
+├── apps/
+│   ├── research_api/
+│   │   └── main.py
+│   │
+│   ├── signal_worker/
+│   │   └── main.py
+│   │
+│   ├── risk_service/
+│   │   └── main.py
+│   │
+│   ├── trader_gateway/
+│   │   └── main.py
+│   │
+│   ├── scheduler/
+│   │   └── main.py
+│   │
+│   └── monitor_dashboard/
+│       └── main.py
+│
+├── packages/
+│   ├── core/
+│   │   ├── models.py
+│   │   ├── enums.py
+│   │   ├── events.py
+│   │   └── exceptions.py
+│   │
+│   ├── data/
+│   │   ├── market_data_client.py
+│   │   ├── candle_repository.py
+│   │   ├── trade_repository.py
+│   │   └── data_quality.py
+│   │
+│   ├── features/
+│   │   ├── indicators.py
+│   │   ├── volatility.py
+│   │   ├── momentum.py
+│   │   └── market_regime.py
+│   │
+│   ├── signals/
+│   │   ├── base_signal.py
+│   │   ├── trend_signal.py
+│   │   ├── mean_reversion_signal.py
+│   │   └── funding_rate_signal.py
+│   │
+│   ├── portfolio/
+│   │   ├── portfolio_state.py
+│   │   ├── allocation.py
+│   │   ├── position_sizing.py
+│   │   └── portfolio_target.py
+│   │
+│   ├── risk/
+│   │   ├── risk_engine.py
+│   │   ├── account_limits.py
+│   │   ├── drawdown_control.py
+│   │   ├── exposure_control.py
+│   │   ├── kill_switch.py
+│   │   └── risk_decision.py
+│   │
+│   ├── execution/
+│   │   ├── order_intent.py
+│   │   ├── order_router.py
+│   │   ├── execution_policy.py
+│   │   └── reconciliation.py
+│   │
+│   ├── adapters/
+│   │   └── hummingbot/
+│   │       ├── hummingbot_api_client.py
+│   │       ├── controller_config_builder.py
+│   │       ├── executor_client.py
+│   │       └── order_mapper.py
+│   │
+│   ├── backtesting/
+│   │   ├── engine.py
+│   │   ├── simulator.py
+│   │   ├── cost_model.py
+│   │   ├── slippage_model.py
+│   │   └── metrics.py
+│   │
+│   ├── accounting/
+│   │   ├── pnl.py
+│   │   ├── fees.py
+│   │   ├── positions.py
+│   │   └── tax_export.py
+│   │
+│   ├── reporting/
+│   │   ├── daily_report.py
+│   │   ├── strategy_report.py
+│   │   └── performance_report.py
+│   │
+│   └── observability/
+│       ├── logger.py
+│       ├── alerts.py
+│       ├── health_check.py
+│       └── metrics.py
+│
+├── strategies/
+│   ├── crypto_momentum_v1/
+│   │   ├── config.yml
+│   │   ├── signal.py
+│   │   ├── portfolio.yml
+│   │   ├── risk.yml
+│   │   ├── backtest.yml
+│   │   └── README.md
+│   │
+│   ├── btc_trend_v1/
+│   │   ├── config.yml
+│   │   ├── signal.py
+│   │   ├── risk.yml
+│   │   └── README.md
+│   │
+│   └── grid_filter_v1/
+│       ├── config.yml
+│       ├── regime_filter.py
+│       ├── risk.yml
+│       └── README.md
+│
+├── hummingbot_layer/
+│   ├── controllers/
+│   │   └── custom_controllers/
+│   │
+│   ├── scripts/
+│   │   └── custom_scripts/
+│   │
+│   └── configs/
+│       └── controller_configs/
+│
+├── notebooks/
+│   ├── 01_data_check.ipynb
+│   ├── 02_signal_research.ipynb
+│   ├── 03_backtest_analysis.ipynb
+│   └── 04_live_vs_backtest.ipynb
+│
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   ├── backtest/
+│   └── live_sandbox/
+│
+├── infra/
+│   ├── postgres/
+│   ├── redis/
+│   ├── grafana/
+│   ├── prometheus/
+│   └── docker/
+│
+└── docs/
+    ├── architecture.md
+    ├── risk_policy.md
+    ├── strategy_lifecycle.md
+    └── deployment.md
