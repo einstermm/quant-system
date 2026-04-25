@@ -48,6 +48,38 @@ Hummingbot 直接承担：
   --quality-report /tmp/quant-system-data-quality.json
 ```
 
+## Phase 2.1 Binance 历史 K 线下载
+
+```bash
+./venv/bin/python -m packages.data.download_binance_candles \
+  --symbols BTC-USDT ETH-USDT \
+  --interval 4h \
+  --start 2025-01-01 \
+  --end 2026-01-01 \
+  --output data/raw/binance_spot_BTC-ETH_4h_2025.csv \
+  --quality-report data/reports/binance_spot_BTC-ETH_4h_2025_quality.json
+```
+
+如果本机 Python 证书链被本地代理或系统 CA 配置影响，且只下载 public market data，可以临时追加
+`--insecure-skip-tls-verify`。
+
+## Phase 2.2 SQLite 数据仓库
+
+```bash
+./venv/bin/python -m packages.data.load_candles_sqlite \
+  --input data/raw/binance_spot_BTC-ETH_4h_2025.csv \
+  --db data/warehouse/quant_system.sqlite \
+  --quality-report data/reports/binance_spot_BTC-ETH_4h_2025_sqlite_load_quality.json
+```
+
+## Phase 2.3 策略数据查询
+
+```bash
+./venv/bin/python -m packages.data.query_strategy_candles \
+  --strategy-dir strategies/crypto_momentum_v1 \
+  --db data/warehouse/quant_system.sqlite
+```
+
 ## 下一步
 
 1. 先完成 `packages/core`、`packages/risk`、`packages/execution` 的接口稳定。

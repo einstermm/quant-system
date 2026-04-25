@@ -1,6 +1,6 @@
 """Timeframe parsing helpers."""
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 
 _TIMEFRAME_TO_DELTA = {
@@ -24,3 +24,11 @@ def interval_to_timedelta(interval: str) -> timedelta:
         return _TIMEFRAME_TO_DELTA[interval]
     except KeyError as exc:
         raise ValueError(f"unsupported interval: {interval}") from exc
+
+
+def expected_interval_count(*, start: datetime, end: datetime, interval: str) -> int:
+    if start >= end:
+        raise ValueError("start must be before end")
+    delta = interval_to_timedelta(interval)
+    total_seconds = (end - start).total_seconds()
+    return int(total_seconds // delta.total_seconds())

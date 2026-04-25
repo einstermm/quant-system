@@ -61,6 +61,8 @@ def validate_candle_sequence(candles: tuple[Candle, ...] | list[Candle]) -> list
 def build_candle_quality_report(
     candles: tuple[Candle, ...] | list[Candle],
     *,
+    expected_start: datetime | None = None,
+    expected_end: datetime | None = None,
     max_close_change_pct: Decimal = Decimal("0.50"),
     max_range_pct: Decimal = Decimal("1.00"),
 ) -> CandleQualityReport:
@@ -103,6 +105,40 @@ def build_candle_quality_report(
 
         expected_delta = interval_to_timedelta(interval)
         sorted_group = sorted(group_candles, key=lambda candle: candle.timestamp)
+
+        if expected_start is not None and sorted_group[0].timestamp > expected_start:
+            issues.append(
+                CandleQualityIssue(
+                    code="missing_start",
+                    severity="error",
+                    message=(
+                        f"first candle {sorted_group[0].timestamp.isoformat()} is after "
+                        f"expected start {expected_start.isoformat()}"
+                    ),
+                    exchange=exchange,
+                    trading_pair=trading_pair,
+                    interval=interval,
+                    timestamp=sorted_group[0].timestamp,
+                )
+            )
+
+        if expected_end is not None:
+            last_expected_open = expected_end - expected_delta
+            if sorted_group[-1].timestamp < last_expected_open:
+                issues.append(
+                    CandleQualityIssue(
+                        code="missing_end",
+                        severity="error",
+                        message=(
+                            f"last candle {sorted_group[-1].timestamp.isoformat()} is before "
+                            f"expected final open {last_expected_open.isoformat()}"
+                        ),
+                        exchange=exchange,
+                        trading_pair=trading_pair,
+                        interval=interval,
+                        timestamp=sorted_group[-1].timestamp,
+                    )
+                )
 
         for previous, current in zip(sorted_group, sorted_group[1:]):
             actual_delta = current.timestamp - previous.timestamp

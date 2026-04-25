@@ -98,3 +98,32 @@ def read_candles_csv(path: str | Path, *, strict: bool = True) -> CandleCSVReadR
 
     candles.sort(key=lambda candle: (candle.exchange, candle.trading_pair, candle.interval, candle.timestamp))
     return CandleCSVReadResult(csv_path, tuple(candles), tuple(row_errors))
+
+
+def write_candles_csv(candles: tuple[Candle, ...] | list[Candle], path: str | Path) -> Path:
+    csv_path = Path(path)
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
+    sorted_candles = sorted(
+        candles,
+        key=lambda candle: (candle.exchange, candle.trading_pair, candle.interval, candle.timestamp),
+    )
+
+    with csv_path.open("w", encoding="utf-8", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=REQUIRED_COLUMNS)
+        writer.writeheader()
+        for candle in sorted_candles:
+            writer.writerow(
+                {
+                    "timestamp": candle.timestamp.isoformat(),
+                    "exchange": candle.exchange,
+                    "trading_pair": candle.trading_pair,
+                    "interval": candle.interval,
+                    "open": str(candle.open),
+                    "high": str(candle.high),
+                    "low": str(candle.low),
+                    "close": str(candle.close),
+                    "volume": str(candle.volume),
+                }
+            )
+
+    return csv_path

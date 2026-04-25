@@ -27,6 +27,15 @@
 
 状态：已完成本地 CSV 导入第一版，后续再接公网数据源和持久化仓库。
 
+Phase 2.1 状态：Binance spot public K 线下载器已实现，默认范围可配置为
+`BTC-USDT`、`ETH-USDT`、`4h`、`2025-01-01` 到 `2026-01-01`。
+
+Phase 2.2 状态：SQLite K 线仓库已实现，可把 CSV 数据导入本地 SQLite，并通过
+同一 `CandleRepository` 接口查询。
+
+Phase 2.3 状态：统一 `MarketDataService` 已实现，策略配置可以生成 `CandleQuery`，
+并从 SQLite 检查回测数据覆盖是否完整。
+
 ## Phase 3: 回测研究
 
 目标：

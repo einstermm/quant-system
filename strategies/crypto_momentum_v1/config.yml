@@ -6,7 +6,7 @@ universe:
   symbols:
     - BTC-USDT
     - ETH-USDT
-timeframe: 1h
+timeframe: 4h
 signal:
   type: moving_average_trend
   fast_window: 24
