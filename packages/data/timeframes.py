@@ -1,6 +1,6 @@
 """Timeframe parsing helpers."""
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 
 _TIMEFRAME_TO_DELTA = {
@@ -32,3 +32,13 @@ def expected_interval_count(*, start: datetime, end: datetime, interval: str) ->
     delta = interval_to_timedelta(interval)
     total_seconds = (end - start).total_seconds()
     return int(total_seconds // delta.total_seconds())
+
+
+def floor_datetime_to_interval(value: datetime, interval: str) -> datetime:
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=UTC)
+    delta = interval_to_timedelta(interval)
+    interval_seconds = int(delta.total_seconds())
+    timestamp = int(value.astimezone(UTC).timestamp())
+    floored_timestamp = timestamp - (timestamp % interval_seconds)
+    return datetime.fromtimestamp(floored_timestamp, tz=UTC)

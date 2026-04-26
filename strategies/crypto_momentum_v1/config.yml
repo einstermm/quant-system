@@ -11,6 +11,11 @@ signal:
   type: moving_average_trend
   fast_window: 24
   slow_window: 96
+regime_filter:
+  enabled: false
+  min_trend_strength: "0"
+  max_volatility: null
+  volatility_window: null
 execution:
   mode: paper
   policy: market_order

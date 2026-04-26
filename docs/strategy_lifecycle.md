@@ -15,3 +15,10 @@
 - README
 - 回测报告
 - paper trading 观察记录
+
+paper trading 观察记录至少包含：
+
+- 每轮 cycle 的账户权益、持仓和目标权重。
+- 每个订单意图的风控状态和拒绝原因。
+- 数据覆盖和质量状态。
+- observation summary JSON 与 Markdown report。

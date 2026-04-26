@@ -1,0 +1,5 @@
+max_order_notional: "1000"
+max_symbol_notional: "5000"
+max_gross_notional: "5000"
+max_daily_loss: "250"
+max_drawdown_pct: "0.10"

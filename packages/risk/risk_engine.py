@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from decimal import Decimal
+
+from packages.core.enums import OrderSide
 from packages.core.models import AccountSnapshot
 from packages.execution.order_intent import OrderIntent
 from packages.risk.account_limits import AccountRiskLimits
@@ -34,6 +37,32 @@ class RiskEngine:
                 f"order notional {order_notional} exceeds max {self._limits.max_order_notional}",
             )
 
+        if intent.request.reduce_only:
+            current_symbol_notional = _signed_symbol_notional(account, intent.symbol)
+            current_symbol_exposure = abs(current_symbol_notional)
+            if current_symbol_exposure <= Decimal("0"):
+                return RiskDecision.reject(
+                    intent.intent_id,
+                    "reduce-only order has no current symbol exposure",
+                )
+            if (
+                intent.request.side is OrderSide.SELL
+                and current_symbol_notional <= Decimal("0")
+            ) or (
+                intent.request.side is OrderSide.BUY
+                and current_symbol_notional >= Decimal("0")
+            ):
+                return RiskDecision.reject(
+                    intent.intent_id,
+                    "reduce-only order does not reduce current symbol exposure",
+                )
+            if order_notional > current_symbol_exposure:
+                return RiskDecision.reject(
+                    intent.intent_id,
+                    "reduce-only order exceeds current symbol exposure",
+                )
+            return RiskDecision.approve(intent.intent_id)
+
         projected_symbol_exposure = account.symbol_exposure(intent.symbol) + order_notional
         if projected_symbol_exposure > self._limits.max_symbol_notional:
             return RiskDecision.reject(
@@ -49,3 +78,10 @@ class RiskEngine:
             )
 
         return RiskDecision.approve(intent.intent_id)
+
+
+def _signed_symbol_notional(account: AccountSnapshot, symbol: str) -> Decimal:
+    return sum(
+        (position.notional for position in account.positions if position.symbol == symbol),
+        Decimal("0"),
+    )

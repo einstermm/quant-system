@@ -19,3 +19,7 @@ venv/
 data/raw/
 data/reports/
 data/warehouse/
+
+reports/backtests/
+reports/paper_readiness/
+reports/paper_trading/

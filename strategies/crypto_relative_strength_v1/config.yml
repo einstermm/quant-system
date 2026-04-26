@@ -1,0 +1,21 @@
+strategy_id: crypto_relative_strength_v1
+universe:
+  exchange: binance
+  market_type: spot
+  quote_asset: USDT
+  symbols:
+    - BTC-USDT
+    - ETH-USDT
+    - BNB-USDT
+    - SOL-USDT
+    - XRP-USDT
+    - ADA-USDT
+timeframe: 4h
+signal:
+  type: relative_strength_rotation
+  lookback_window: 72
+  top_n: 2
+  min_momentum: "0"
+execution:
+  mode: paper
+  policy: market_order

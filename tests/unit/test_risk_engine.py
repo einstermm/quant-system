@@ -25,14 +25,17 @@ class RiskEngineTest(TestCase):
         *,
         quantity: Decimal = Decimal("1"),
         estimated_price: Decimal = Decimal("100"),
+        side: OrderSide = OrderSide.BUY,
+        reduce_only: bool = False,
     ) -> OrderIntent:
         request = OrderRequest(
             client_order_id="order-1",
             strategy_id="test_strategy",
             symbol="BTC-USDT",
-            side=OrderSide.BUY,
+            side=side,
             order_type=OrderType.MARKET,
             quantity=quantity,
+            reduce_only=reduce_only,
         )
         return OrderIntent("intent-1", "main", request, estimated_price)
 
@@ -86,3 +89,89 @@ class RiskEngineTest(TestCase):
 
         self.assertEqual(RiskDecisionStatus.REJECTED, decision.status)
         self.assertIn("symbol exposure", decision.reason)
+
+    def test_approves_reduce_only_order_that_reduces_long_exposure(self) -> None:
+        engine = RiskEngine(self.limits)
+        account = AccountSnapshot(
+            "main",
+            Decimal("10000"),
+            Decimal("9500"),
+            positions=(
+                PortfolioPosition(
+                    "BTC-USDT",
+                    Decimal("5"),
+                    Decimal("100"),
+                    Decimal("100"),
+                ),
+            ),
+        )
+
+        decision = engine.evaluate_order_intent(
+            self.make_intent(
+                quantity=Decimal("4"),
+                estimated_price=Decimal("100"),
+                side=OrderSide.SELL,
+                reduce_only=True,
+            ),
+            account,
+        )
+
+        self.assertEqual(RiskDecisionStatus.APPROVED, decision.status)
+
+    def test_rejects_reduce_only_order_with_wrong_direction(self) -> None:
+        engine = RiskEngine(self.limits)
+        account = AccountSnapshot(
+            "main",
+            Decimal("10000"),
+            Decimal("9500"),
+            positions=(
+                PortfolioPosition(
+                    "BTC-USDT",
+                    Decimal("5"),
+                    Decimal("100"),
+                    Decimal("100"),
+                ),
+            ),
+        )
+
+        decision = engine.evaluate_order_intent(
+            self.make_intent(
+                quantity=Decimal("4"),
+                estimated_price=Decimal("100"),
+                side=OrderSide.BUY,
+                reduce_only=True,
+            ),
+            account,
+        )
+
+        self.assertEqual(RiskDecisionStatus.REJECTED, decision.status)
+        self.assertIn("does not reduce", decision.reason)
+
+    def test_rejects_reduce_only_order_above_current_exposure(self) -> None:
+        engine = RiskEngine(self.limits)
+        account = AccountSnapshot(
+            "main",
+            Decimal("10000"),
+            Decimal("9500"),
+            positions=(
+                PortfolioPosition(
+                    "BTC-USDT",
+                    Decimal("5"),
+                    Decimal("100"),
+                    Decimal("100"),
+                ),
+            ),
+        )
+
+        decision = engine.evaluate_order_intent(
+            self.make_intent(
+                quantity=Decimal("6"),
+                estimated_price=Decimal("100"),
+                side=OrderSide.SELL,
+                reduce_only=True,
+            ),
+            account,
+        )
+
+        self.assertEqual(RiskDecisionStatus.REJECTED, decision.status)
+        self.assertIn("exceeds current symbol exposure", decision.reason)
