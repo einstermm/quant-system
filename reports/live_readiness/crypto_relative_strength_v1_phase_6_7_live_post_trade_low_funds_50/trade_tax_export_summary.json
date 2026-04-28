@@ -1,0 +1,11 @@
+{
+  "cad_fx_rate": "1",
+  "cost_basis_cad_estimate": "49.266880",
+  "cost_basis_quote_estimate": "49.266880",
+  "fee_quote_estimate": "0.049266880",
+  "fees_cad_estimate": "0.049266880",
+  "fx_source": "validation_only_not_tax_filing",
+  "gross_quote_notional": "49.266880",
+  "notes": "Validation export only; confirm CAD FX and Canadian ACB treatment before tax filing.",
+  "row_count": 1
+}

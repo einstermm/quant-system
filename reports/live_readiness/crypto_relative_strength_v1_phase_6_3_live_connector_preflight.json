@@ -1,0 +1,197 @@
+{
+  "alerts": [
+    {
+      "created_at": "2026-04-28T01:53:25.927943+00:00",
+      "message": "Phase 6.3 reports connector field names only; credential values are never emitted.",
+      "severity": "INFO",
+      "title": "Secrets redacted"
+    }
+  ],
+  "allowed_pairs": [
+    "BTC-USDT",
+    "ETH-USDT"
+  ],
+  "artifacts": {
+    "activation_checklist_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_2_live_activation_checklist.json",
+    "credential_allowlist_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_2_credential_allowlist_review.json",
+    "live_risk_yml": "strategies/crypto_relative_strength_v1/risk.live.phase_6_2.yml",
+    "operator_signoff_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_2_operator_signoff.json"
+  },
+  "checklist": [
+    {
+      "details": "Activation checklist decision is live_activation_ready.",
+      "evidence": "",
+      "item_id": "phase_6_2_activation",
+      "status": "PASS",
+      "title": "Phase 6.2 activation checklist ready"
+    },
+    {
+      "details": "Credential review decision is credential_allowlist_review_confirmed.",
+      "evidence": "",
+      "item_id": "credential_allowlist",
+      "status": "PASS",
+      "title": "Credential and exchange allowlist reviewed"
+    },
+    {
+      "details": "Operator signoff decision is operator_signoff_confirmed.",
+      "evidence": "",
+      "item_id": "operator_signoff",
+      "status": "PASS",
+      "title": "Operator signoff recorded"
+    },
+    {
+      "details": "Credential review connector=binance, market_type=spot.",
+      "evidence": "",
+      "item_id": "connector_scope",
+      "status": "PASS",
+      "title": "Connector scope matches first live target"
+    },
+    {
+      "details": "Credential pairs=('BTC-USDT', 'ETH-USDT'); operator pairs=('BTC-USDT', 'ETH-USDT').",
+      "evidence": "",
+      "item_id": "symbol_allowlist",
+      "status": "PASS",
+      "title": "First live symbol allowlist matches"
+    },
+    {
+      "details": "Strict live risk file must match the Phase 6.2 operator signoff.",
+      "evidence": "",
+      "item_id": "live_risk_config",
+      "status": "PASS",
+      "title": "Live risk config matches operator signoff"
+    },
+    {
+      "details": "Only the approved first-live connector may be mounted for Phase 6.3.",
+      "evidence": "",
+      "item_id": "unexpected_live_connectors",
+      "status": "PASS",
+      "title": "No unexpected live connector configs mounted"
+    },
+    {
+      "details": "Configure this only inside Hummingbot CLI; values remain redacted.",
+      "evidence": "/Users/albertlz/Downloads/private_proj/hummingbot/conf/connectors/binance.yml",
+      "item_id": "expected_connector_config",
+      "status": "PASS",
+      "title": "Expected live connector config exists"
+    },
+    {
+      "details": "The report records field names only and never emits credential values.",
+      "evidence": "",
+      "item_id": "connector_secret_fields",
+      "status": "PASS",
+      "title": "Expected connector secret field names detected"
+    },
+    {
+      "details": "LIVE_TRADING_ENABLED must remain false until the final live batch activation step.",
+      "evidence": "",
+      "item_id": "live_disabled",
+      "status": "PASS",
+      "title": "Live trading remains disabled in quant-system"
+    },
+    {
+      "details": "GLOBAL_KILL_SWITCH must remain true before final live batch activation.",
+      "evidence": "",
+      "item_id": "kill_switch_enabled",
+      "status": "PASS",
+      "title": "Global kill switch remains enabled"
+    },
+    {
+      "details": "At least one external alert channel must be configured before live connector use.",
+      "evidence": "",
+      "item_id": "alert_channel",
+      "status": "PASS",
+      "title": "External alert channel configured"
+    },
+    {
+      "details": "Real exchange credentials belong in Hummingbot connector config.",
+      "evidence": "",
+      "item_id": "exchange_keys_not_in_quant_env",
+      "status": "PASS",
+      "title": "Exchange keys are not stored in quant-system env"
+    }
+  ],
+  "connector_status": {
+    "connector_configs": [
+      {
+        "account_id": "unknown",
+        "connector": "binance",
+        "connector_risk": "live",
+        "path": "/Users/albertlz/Downloads/private_proj/hummingbot/conf/connectors/binance.yml",
+        "secret_fields": [
+          "binance_api_key",
+          "binance_api_secret"
+        ],
+        "secret_values_redacted": true
+      }
+    ],
+    "expected_connector_configs": [
+      {
+        "account_id": "unknown",
+        "connector": "binance",
+        "connector_risk": "live",
+        "path": "/Users/albertlz/Downloads/private_proj/hummingbot/conf/connectors/binance.yml",
+        "secret_fields": [
+          "binance_api_key",
+          "binance_api_secret"
+        ],
+        "secret_values_redacted": true
+      }
+    ],
+    "expected_connector_configured": true,
+    "expected_container_config_path": "/home/hummingbot/conf/connectors/binance.yml",
+    "expected_host_config_path": "/Users/albertlz/Downloads/private_proj/hummingbot/conf/connectors/binance.yml",
+    "hummingbot_root": "/Users/albertlz/Downloads/private_proj/hummingbot",
+    "missing_secret_fields": [],
+    "required_secret_fields": [
+      "binance_api_key",
+      "binance_api_secret"
+    ],
+    "secret_values_redacted": true,
+    "unexpected_live_connector_configs": []
+  },
+  "decision": "live_connector_preflight_ready",
+  "environment": {
+    "alert_channel_configured": true,
+    "exchange_key_env_detected": false,
+    "global_kill_switch": true,
+    "live_trading_enabled": false
+  },
+  "expected_connector": "binance",
+  "generated_at": "2026-04-28T01:53:25.928297+00:00",
+  "market_type": "spot",
+  "risk_summary": {
+    "credential_limits_source": "credential_allowlist.accepted_live_risk_limits",
+    "expected_limits_source": "operator_signoff.confirmed_limits",
+    "max_daily_loss_credential": "50",
+    "max_daily_loss_expected": "50",
+    "max_daily_loss_live": "50",
+    "max_daily_loss_matches_credential_review": true,
+    "max_daily_loss_matches_operator_signoff": true,
+    "max_drawdown_pct_credential": "",
+    "max_drawdown_pct_expected": "0.05",
+    "max_drawdown_pct_live": "0.05",
+    "max_drawdown_pct_matches_operator_signoff": true,
+    "max_gross_notional_credential": "1000",
+    "max_gross_notional_expected": "1000",
+    "max_gross_notional_live": "1000",
+    "max_gross_notional_matches_credential_review": true,
+    "max_gross_notional_matches_operator_signoff": true,
+    "max_order_notional_credential": "250",
+    "max_order_notional_expected": "250",
+    "max_order_notional_live": "250",
+    "max_order_notional_matches_credential_review": true,
+    "max_order_notional_matches_operator_signoff": true,
+    "max_symbol_notional_credential": "500",
+    "max_symbol_notional_expected": "500",
+    "max_symbol_notional_live": "500",
+    "max_symbol_notional_matches_credential_review": true,
+    "max_symbol_notional_matches_operator_signoff": true
+  },
+  "runbook": [
+    "Keep LIVE_TRADING_ENABLED=false and GLOBAL_KILL_SWITCH=true until live activation.",
+    "Do not expand symbols or risk limits beyond BTC-USDT and ETH-USDT.",
+    "Proceed to the next phase for final one-batch live activation planning."
+  ],
+  "session_id": "crypto_relative_strength_v1_phase_6_3_live_connector_preflight",
+  "strategy_id": "crypto_relative_strength_v1"
+}

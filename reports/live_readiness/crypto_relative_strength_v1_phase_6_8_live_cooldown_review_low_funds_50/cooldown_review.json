@@ -1,0 +1,87 @@
+{
+  "account_id": "binance-main-spot",
+  "alerts": [
+    {
+      "created_at": "2026-04-28T02:57:41.673293+00:00",
+      "message": "Minimum cooldown window has not elapsed; do not start another live batch.",
+      "severity": "WARN",
+      "title": "Cooldown active"
+    },
+    {
+      "created_at": "2026-04-28T02:57:41.673319+00:00",
+      "message": "Hummingbot completed the live order, but the MQTT bridge failed to connect during the run.",
+      "severity": "WARN",
+      "title": "Carried post-trade warning: MQTT bridge unavailable"
+    },
+    {
+      "created_at": "2026-04-28T02:57:41.673323+00:00",
+      "message": "Tax export uses validation-only FX/source assumptions and is not final tax filing output.",
+      "severity": "WARN",
+      "title": "Carried post-trade warning: Validation tax export"
+    }
+  ],
+  "artifacts": {
+    "cooldown_review_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_8_live_cooldown_review_low_funds_50/cooldown_review.json",
+    "cooldown_review_md": "reports/live_readiness/crypto_relative_strength_v1_phase_6_8_live_cooldown_review_low_funds_50/cooldown_review.md",
+    "event_jsonl": "/Users/albertlz/Downloads/private_proj/hummingbot/data/crypto_relative_strength_v1_phase_6_6_live_one_batch_low_funds_50_events.jsonl",
+    "manual_open_orders_check_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_8_live_cooldown_review_low_funds_50/manual_open_orders_check.json",
+    "post_trade_report_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_7_live_post_trade_low_funds_50/post_trade_report.json",
+    "runner_config_yml": "/Users/albertlz/Downloads/private_proj/hummingbot/conf/scripts/crypto_relative_strength_v1_phase_6_6_live_one_batch_low_funds_50.yml"
+  },
+  "cooldown_window": {
+    "completed_at": "2026-04-28T02:34:33.175500+00:00",
+    "cooldown_elapsed": false,
+    "elapsed_hours": "0.3856889769444444444444444444",
+    "generated_at": "2026-04-28T02:57:41.655817+00:00",
+    "minimum_cooldown_hours": "24",
+    "next_review_not_before": "2026-04-29T02:34:33.175500+00:00"
+  },
+  "expansion_controls": {
+    "allowed_pairs": [
+      "BTC-USDT",
+      "ETH-USDT"
+    ],
+    "allowlist_locked": true,
+    "expansion_allowed": false,
+    "max_batch_notional": "50",
+    "max_order_notional": "50",
+    "reason": "Phase 6.8 is cooldown review only; no pair or notional expansion is allowed."
+  },
+  "generated_at": "2026-04-28T02:57:41.655817+00:00",
+  "manual_checks": {
+    "abnormal_open_orders_found": false,
+    "checked_at": "2026-04-28T02:55:38+00:00",
+    "evidence": "Operator confirmed manual Binance spot open orders check completed; no abnormal open orders found.",
+    "open_orders_check_status": "confirmed_clean"
+  },
+  "operational_checks": {
+    "event_log_last_event_at": "2026-04-28T02:34:33.175500+00:00",
+    "event_log_last_event_type": "session_completed",
+    "event_log_lines": 3022,
+    "hummingbot_container_status": "Exited (137) 27 minutes ago",
+    "runner_config_armed": false,
+    "runner_container_status": "not_found"
+  },
+  "post_trade_summary": {
+    "balance_mismatches": [],
+    "gross_quote_notional": "49.266880",
+    "missing_db_fills": [],
+    "missing_fills": [],
+    "missing_submissions": [],
+    "net_base_quantity": "0.00063936",
+    "post_trade_status": "live_post_trade_reconciled_with_warnings",
+    "risk_caps_passed": true,
+    "submitted_filled_db": "1 / 1 / 1"
+  },
+  "recommended_actions": [
+    "Do not run another live batch until the cooldown window has elapsed.",
+    "Do not expand beyond BTC-USDT / ETH-USDT or the 50 USDT low-funds cap.",
+    "Open orders manual check is complete; keep the evidence with Phase 6.8 artifacts.",
+    "Keep the Phase 6.6 one-shot runner config disarmed unless a new activation is approved.",
+    "Fix or intentionally disable the MQTT bridge before any larger live session.",
+    "Replace validation-only FX with a real CAD FX source before using exports for tax filing."
+  ],
+  "session_id": "crypto_relative_strength_v1_phase_6_8_live_cooldown_review_low_funds_50",
+  "status": "live_cooldown_active_with_warnings",
+  "strategy_id": "crypto_relative_strength_v1"
+}

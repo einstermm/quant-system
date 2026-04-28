@@ -1,0 +1,113 @@
+{
+  "account_id": "binance-main-spot",
+  "alerts": [
+    {
+      "created_at": "2026-04-28T03:06:10.687378+00:00",
+      "message": "24 hour cooldown window has not elapsed.",
+      "severity": "WARN",
+      "title": "Next live batch not allowed"
+    },
+    {
+      "created_at": "2026-04-28T03:06:10.687385+00:00",
+      "message": "Tax export still uses validation-only assumptions.",
+      "severity": "WARN",
+      "title": "Tax export not final"
+    },
+    {
+      "created_at": "2026-04-28T03:06:10.687390+00:00",
+      "message": "MQTT bridge warning remains unresolved.",
+      "severity": "WARN",
+      "title": "MQTT bridge not ready"
+    },
+    {
+      "created_at": "2026-04-28T03:06:10.687391+00:00",
+      "message": "The initial BTC position remains held under observation; no exit is armed.",
+      "severity": "INFO",
+      "title": "Position hold plan"
+    }
+  ],
+  "artifacts": {
+    "cooldown_review_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_8_live_cooldown_review_low_funds_50/cooldown_review.json",
+    "initial_closure_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_9_initial_closure_position_plan_low_funds_50/initial_closure_report.json",
+    "initial_closure_md": "reports/live_readiness/crypto_relative_strength_v1_phase_6_9_initial_closure_position_plan_low_funds_50/initial_closure_report.md",
+    "post_trade_report_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_7_live_post_trade_low_funds_50/post_trade_report.json"
+  },
+  "closure_summary": {
+    "balance_clean": true,
+    "evidence_complete": true,
+    "initial_flow_closed": true,
+    "manual_open_orders_clean": true,
+    "mqtt_bridge_ready": false,
+    "order_evidence_complete": true,
+    "post_trade_reconciled": true,
+    "risk_caps_passed": true,
+    "runner_disarmed": true,
+    "tax_export_final": false
+  },
+  "generated_at": "2026-04-28T03:06:10.687114+00:00",
+  "next_live_decision": {
+    "allowed_pairs": [
+      "BTC-USDT",
+      "ETH-USDT"
+    ],
+    "cooldown_elapsed": false,
+    "decision": "NO_GO_COOLDOWN_ACTIVE",
+    "expansion_allowed": false,
+    "max_batch_notional": "50",
+    "max_order_notional": "50",
+    "new_live_batch_requires_operator_signoff": true,
+    "next_review_not_before": "2026-04-29T02:34:33.175500+00:00",
+    "reason": "24 hour cooldown window has not elapsed."
+  },
+  "position_lifecycle_plan": {
+    "account_ending_base_balance": "0.00074442",
+    "entry_average_price_quote": "76979.5",
+    "entry_cost_basis_quote": "49.266880",
+    "entry_gross_quote_notional": "49.266880",
+    "exit_plan": "No automatic exit is armed. If the operator chooses to close this position, generate a separate one-shot sell runner capped by available BTC and risk limits.",
+    "exit_requires_activation": true,
+    "fee_amount": "0.00000064",
+    "fee_asset": "BTC",
+    "hold_until": "Next completed cooldown review or explicit operator exit signoff.",
+    "side_opened": "buy",
+    "stance": "HOLD_UNDER_OBSERVATION",
+    "strategy_gross_base_quantity": "0.00064",
+    "strategy_net_base_quantity": "0.00063936",
+    "trading_pair": "BTC-USDT"
+  },
+  "remaining_work": [
+    {
+      "details": "Wait until 2026-04-29T02:34:33.175500+00:00 and rerun Phase 6.8.",
+      "priority": "P0",
+      "title": "Complete cooldown review"
+    },
+    {
+      "details": "Do not increase pair coverage, order count, or notional caps in the initial version.",
+      "priority": "P0",
+      "title": "Keep live expansion disabled"
+    },
+    {
+      "details": "Hold the small BTC position under observation or create a separately approved exit plan.",
+      "priority": "P1",
+      "title": "Decide BTC position lifecycle"
+    },
+    {
+      "details": "Fix or intentionally disable MQTT before any longer live-running Hummingbot session.",
+      "priority": "P1",
+      "title": "Resolve MQTT bridge warning"
+    },
+    {
+      "details": "Use a real CAD FX source and ACB lot matching before relying on tax exports.",
+      "priority": "P2",
+      "title": "Replace validation tax FX"
+    },
+    {
+      "details": "Document the exact data-to-live-to-reconciliation command sequence for the initial version.",
+      "priority": "P2",
+      "title": "Freeze v0 runbook"
+    }
+  ],
+  "session_id": "crypto_relative_strength_v1_phase_6_9_initial_closure_position_plan_low_funds_50",
+  "status": "initial_v0_flow_closed_with_warnings",
+  "strategy_id": "crypto_relative_strength_v1"
+}

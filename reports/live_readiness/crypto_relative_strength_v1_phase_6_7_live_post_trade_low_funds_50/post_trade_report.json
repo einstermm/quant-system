@@ -1,0 +1,150 @@
+{
+  "account_id": "binance-main-spot",
+  "alerts": [
+    {
+      "created_at": "2026-04-28T02:44:55.869378+00:00",
+      "message": "Hummingbot completed the live order, but the MQTT bridge failed to connect during the run.",
+      "severity": "WARN",
+      "title": "MQTT bridge unavailable"
+    },
+    {
+      "created_at": "2026-04-28T02:44:55.869396+00:00",
+      "message": "Tax export uses validation-only FX/source assumptions and is not final tax filing output.",
+      "severity": "WARN",
+      "title": "Validation tax export"
+    }
+  ],
+  "artifacts": {
+    "candidate_package_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_5_candidate_live_batch_package_low_funds_50/package.json",
+    "daily_report_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_7_live_post_trade_low_funds_50/daily_report.json",
+    "daily_report_md": "reports/live_readiness/crypto_relative_strength_v1_phase_6_7_live_post_trade_low_funds_50/daily_report.md",
+    "event_jsonl": "/Users/albertlz/Downloads/private_proj/hummingbot/data/crypto_relative_strength_v1_phase_6_6_live_one_batch_low_funds_50_events.jsonl",
+    "log_file": "/Users/albertlz/Downloads/private_proj/hummingbot/logs/logs_crypto_relative_strength_v1_phase_6_6_live_one_batch_low_funds_50.log",
+    "normalized_live_trades_jsonl": "reports/live_readiness/crypto_relative_strength_v1_phase_6_7_live_post_trade_low_funds_50/normalized_live_trades.jsonl",
+    "post_trade_report_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_7_live_post_trade_low_funds_50/post_trade_report.json",
+    "post_trade_report_md": "reports/live_readiness/crypto_relative_strength_v1_phase_6_7_live_post_trade_low_funds_50/post_trade_report.md",
+    "runner_package_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_6_live_one_batch_runner_low_funds_50/package.json",
+    "sqlite_db": "/Users/albertlz/Downloads/private_proj/hummingbot/data/crypto_relative_strength_v1_phase_6_6_live_one_batch_low_funds_50.sqlite",
+    "trade_tax_export_csv": "reports/live_readiness/crypto_relative_strength_v1_phase_6_7_live_post_trade_low_funds_50/trade_tax_export.csv",
+    "trade_tax_export_summary_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_7_live_post_trade_low_funds_50/trade_tax_export_summary.json",
+    "trade_tax_export_summary_md": "reports/live_readiness/crypto_relative_strength_v1_phase_6_7_live_post_trade_low_funds_50/trade_tax_export_summary.md"
+  },
+  "balance_checks": {
+    "base_asset": "BTC",
+    "base_delta": "0.00063936",
+    "ending_balances": {
+      "BTC": "0.00074442",
+      "USDT": "13.66945000"
+    },
+    "expected_base_delta": "0.00063936",
+    "expected_quote_delta": "-49.266880",
+    "mismatches": [],
+    "quote_asset": "USDT",
+    "quote_delta": "-49.26688000",
+    "starting_balances": {
+      "BTC": "0.00010506",
+      "USDT": "62.93633000"
+    },
+    "status": "checked"
+  },
+  "event_counts": {
+    "balance": 3016,
+    "filled": 1,
+    "heartbeat": 2,
+    "session_completed": 1,
+    "session_started": 1,
+    "submitted": 1
+  },
+  "fill_summary": {
+    "average_price_quote": "76979.5",
+    "cost_basis_quote_estimate": "49.266880",
+    "fee_amount": "0.00000064",
+    "fee_asset": "BTC",
+    "fee_quote_estimate": "0.049266880",
+    "fills": [
+      {
+        "account_id": "binance-main-spot",
+        "base_asset": "BTC",
+        "cad_fx_rate": "1",
+        "cash_flow_quote": "-49.266880",
+        "client_order_id": "crypto_relative_strength_v1_first_live_batch_001_low_funds_50-btc_usdt-1",
+        "connector": "binance",
+        "cost_basis_cad_estimate": "49.266880",
+        "cost_basis_quote_estimate": "49.266880",
+        "exchange_order_id": "61135332197",
+        "exchange_trade_id": "6256967929",
+        "fee_amount": "0.00000064",
+        "fee_asset": "BTC",
+        "fee_quote_estimate": "0.049266880",
+        "fees_cad_estimate": "0.049266880",
+        "fx_source": "validation_only_not_tax_filing",
+        "gross_base_quantity": "0.00064",
+        "gross_quote_notional": "49.266880",
+        "hb_order_id": "x-MG43PCSNBBCUT6507c1061cb75e4f9",
+        "net_base_quantity": "0.00063936",
+        "notes": "Validation export only. Fee was deducted from base returns; cost basis estimate uses quote spent and net base quantity. Confirm final tax treatment before filing.",
+        "order_type": "market",
+        "price_quote": "76979.5",
+        "quote_asset": "USDT",
+        "side": "buy",
+        "source": "hummingbot_live",
+        "strategy_id": "crypto_relative_strength_v1",
+        "timestamp": "2026-04-28T02:34:01+00:00",
+        "trade_date": "2026-04-28",
+        "trading_pair": "BTC-USDT"
+      }
+    ],
+    "gross_base_quantity": "0.00064",
+    "gross_quote_notional": "49.266880",
+    "net_base_quantity": "0.00063936"
+  },
+  "generated_at": "2026-04-28T02:44:55.869401+00:00",
+  "operational_checks": {
+    "hummingbot_stop_observed": true,
+    "mqtt_bridge_failures": 4,
+    "runner_container_status": "not_found"
+  },
+  "order_checks": {
+    "db_fills": 1,
+    "expected_orders": 1,
+    "filled_orders": 1,
+    "missing_db_fills": [],
+    "missing_fills": [],
+    "missing_submissions": [],
+    "session_completed": true,
+    "submitted_orders": 1,
+    "unknown_db_fills": [],
+    "unknown_fills": [],
+    "unknown_submissions": []
+  },
+  "risk_checks": {
+    "actual_total_notional": "49.266880",
+    "allowed_pairs": [
+      "BTC-USDT",
+      "ETH-USDT"
+    ],
+    "max_batch_notional": "50",
+    "max_order_notional": "50",
+    "max_price_deviation_bps": "200.00",
+    "order_count_inside_cap": true,
+    "order_notional_violations": [],
+    "pair_violations": [],
+    "price_deviation_bps": "50.64150385439979568656706387",
+    "price_deviation_inside_cap": true,
+    "total_notional_inside_cap": true
+  },
+  "session_id": "crypto_relative_strength_v1_phase_6_7_live_post_trade_low_funds_50",
+  "status": "live_post_trade_reconciled_with_warnings",
+  "strategy_id": "crypto_relative_strength_v1",
+  "tax_summary": {
+    "cad_fx_rate": "1",
+    "cost_basis_cad_estimate": "49.266880",
+    "cost_basis_quote_estimate": "49.266880",
+    "fee_quote_estimate": "0.049266880",
+    "fees_cad_estimate": "0.049266880",
+    "fx_source": "validation_only_not_tax_filing",
+    "gross_quote_notional": "49.266880",
+    "notes": "Validation export only; confirm CAD FX and Canadian ACB treatment before tax filing.",
+    "row_count": 1
+  }
+}

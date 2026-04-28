@@ -1,0 +1,122 @@
+{
+  "allowed_pairs": [
+    "BTC-USDT",
+    "ETH-USDT"
+  ],
+  "artifacts": {
+    "candidate_orders_jsonl": "reports/live_readiness/crypto_relative_strength_v1_phase_6_5_candidate_live_batch_package_low_funds_50/candidate_orders.jsonl",
+    "package_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_5_candidate_live_batch_package_low_funds_50/package.json",
+    "package_md": "reports/live_readiness/crypto_relative_strength_v1_phase_6_5_candidate_live_batch_package_low_funds_50/package.md"
+  },
+  "batch_id": "crypto_relative_strength_v1_first_live_batch_001_low_funds_50",
+  "candidate_orders": [
+    {
+      "client_order_id": "crypto_relative_strength_v1_first_live_batch_001_low_funds_50-btc_usdt-1",
+      "estimated_price": "77371.32000000",
+      "estimated_quantity": "0.0006462342893981904405921987631",
+      "notional_quote": "50",
+      "order_type": "market",
+      "side": "buy",
+      "signal_momentum": "0.034237807009464912373334096",
+      "signal_timestamp": "2026-04-27T20:00:00+00:00",
+      "trading_pair": "BTC-USDT"
+    }
+  ],
+  "checklist": [
+    {
+      "details": "Phase 6.4 decision is live_batch_activation_plan_approved.",
+      "evidence": "",
+      "item_id": "phase_6_4_approved",
+      "status": "PASS",
+      "title": "Phase 6.4 activation plan approved"
+    },
+    {
+      "details": "refresh_statuses=['ok', 'ok'].",
+      "evidence": "",
+      "item_id": "market_data_refresh",
+      "status": "PASS",
+      "title": "BTC/ETH market data refresh succeeded"
+    },
+    {
+      "details": "allowed_pairs=('BTC-USDT', 'ETH-USDT'); orders=['BTC-USDT'].",
+      "evidence": "",
+      "item_id": "allowlist",
+      "status": "PASS",
+      "title": "Candidate orders are inside allowlist"
+    },
+    {
+      "details": "orders=1; cap=1.",
+      "evidence": "",
+      "item_id": "order_count",
+      "status": "PASS",
+      "title": "Candidate order count is inside batch cap"
+    },
+    {
+      "details": "single_order_cap=250.",
+      "evidence": "",
+      "item_id": "order_notional",
+      "status": "PASS",
+      "title": "Candidate order notionals are inside single-order cap"
+    },
+    {
+      "details": "total_notional=50; cap=50.",
+      "evidence": "",
+      "item_id": "batch_notional",
+      "status": "PASS",
+      "title": "Candidate batch notional is inside batch cap"
+    },
+    {
+      "details": "selected_pairs=['BTC-USDT'].",
+      "evidence": "",
+      "item_id": "signal_available",
+      "status": "PASS",
+      "title": "BTC/ETH-only signal produced candidate orders"
+    },
+    {
+      "details": "Verify Binance spot balances and no unexpected open orders before runner generation.",
+      "evidence": "",
+      "item_id": "exchange_state_check",
+      "status": "MANUAL_REQUIRED",
+      "title": "Exchange balances and open orders reviewed"
+    }
+  ],
+  "connector": "binance",
+  "decision": "live_batch_execution_package_ready_pending_exchange_state_check",
+  "execution_runner_generated": false,
+  "generated_at": "2026-04-28T02:12:41.545635+00:00",
+  "live_order_submission_armed": false,
+  "risk_summary": {
+    "max_batch_notional": "50",
+    "max_batch_orders": 1,
+    "max_daily_loss": "50",
+    "max_drawdown_pct": "0.05",
+    "max_gross_notional": "1000",
+    "max_order_notional": "250",
+    "max_symbol_notional": "500"
+  },
+  "session_id": "crypto_relative_strength_v1_phase_6_5_candidate_live_batch_package_low_funds_50",
+  "signal_summary": {
+    "allowed_pairs": [
+      "BTC-USDT",
+      "ETH-USDT"
+    ],
+    "latest_signal_timestamp": "2026-04-27T20:00:00+00:00",
+    "lookback_window": 72,
+    "min_momentum": "0",
+    "ranked_pairs": [
+      {
+        "estimated_price": "77371.32000000",
+        "momentum": "0.034237807009464912373334096",
+        "signal_timestamp": "2026-04-27T20:00:00+00:00",
+        "trading_pair": "BTC-USDT"
+      }
+    ],
+    "selected_pairs": [
+      "BTC-USDT"
+    ],
+    "signal_type": "relative_strength_rotation",
+    "stale_or_insufficient_pairs": [],
+    "top_n": 2
+  },
+  "strategy_id": "crypto_relative_strength_v1"
+}

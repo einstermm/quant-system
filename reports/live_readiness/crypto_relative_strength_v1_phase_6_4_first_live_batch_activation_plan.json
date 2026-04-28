@@ -1,0 +1,146 @@
+{
+  "activation_sequence": [
+    "Rerun Phase 6.3 immediately before the live batch.",
+    "Send and verify one external alert test.",
+    "Confirm Binance spot account balances and no unexpected open orders.",
+    "Generate the final live batch from the latest BTC/ETH-only signal.",
+    "Cap the batch to two orders and 500 USDT total notional.",
+    "Only after final operator go, arm the one-batch live runner.",
+    "Submit one supervised batch only, then immediately disarm live trading."
+  ],
+  "allowed_pairs": [
+    "BTC-USDT",
+    "ETH-USDT"
+  ],
+  "artifacts": {
+    "credential_allowlist_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_2_credential_allowlist_review.json",
+    "live_connector_preflight_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_3_live_connector_preflight.json",
+    "live_risk_yml": "strategies/crypto_relative_strength_v1/risk.live.phase_6_2.yml",
+    "operator_signoff_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_2_operator_signoff.json"
+  },
+  "batch_id": "crypto_relative_strength_v1_first_live_batch_001",
+  "batch_scope": {
+    "allowed_pairs": [
+      "BTC-USDT",
+      "ETH-USDT"
+    ],
+    "batch_id": "crypto_relative_strength_v1_first_live_batch_001",
+    "connector": "binance",
+    "live_order_submission_armed": false,
+    "market_type": "spot",
+    "max_orders": 2,
+    "max_total_notional": "500",
+    "mode": "single_supervised_live_batch",
+    "requires_final_operator_go": true
+  },
+  "checklist": [
+    {
+      "details": "Phase 6.3 decision is live_connector_preflight_ready.",
+      "evidence": "/Users/albertlz/Downloads/private_proj/hummingbot/conf/connectors/binance.yml",
+      "item_id": "phase_6_3_preflight",
+      "status": "PASS",
+      "title": "Phase 6.3 live connector preflight ready"
+    },
+    {
+      "details": "preflight=('BTC-USDT', 'ETH-USDT'); credential=('BTC-USDT', 'ETH-USDT'); operator=('BTC-USDT', 'ETH-USDT').",
+      "evidence": "",
+      "item_id": "symbol_allowlist",
+      "status": "PASS",
+      "title": "First live allowlist remains exact"
+    },
+    {
+      "details": "max_batch_orders=2; allowed_pairs=2.",
+      "evidence": "",
+      "item_id": "batch_order_count",
+      "status": "PASS",
+      "title": "Batch order count is capped"
+    },
+    {
+      "details": "max_batch_notional=500; max_gross_notional=1000.",
+      "evidence": "",
+      "item_id": "batch_notional_cap",
+      "status": "PASS",
+      "title": "Batch notional is inside gross risk limit"
+    },
+    {
+      "details": "max_order_notional=250; approved=250.",
+      "evidence": "",
+      "item_id": "single_order_cap",
+      "status": "PASS",
+      "title": "Single order cap remains approved"
+    },
+    {
+      "details": "LIVE_TRADING_ENABLED must stay false while this is only a plan.",
+      "evidence": "",
+      "item_id": "live_disabled",
+      "status": "PASS",
+      "title": "Live trading remains disabled before final go"
+    },
+    {
+      "details": "GLOBAL_KILL_SWITCH must stay true until the explicit activation step.",
+      "evidence": "",
+      "item_id": "kill_switch_enabled",
+      "status": "PASS",
+      "title": "Global kill switch remains enabled before final go"
+    },
+    {
+      "details": "External alerts are required for any live batch.",
+      "evidence": "",
+      "item_id": "alert_channel",
+      "status": "PASS",
+      "title": "External alert channel remains configured"
+    },
+    {
+      "details": "Real exchange credentials must stay in Hummingbot connector config.",
+      "evidence": "",
+      "item_id": "exchange_keys_not_in_quant_env",
+      "status": "PASS",
+      "title": "Exchange keys are not stored in quant-system env"
+    },
+    {
+      "details": "Final operator go has been recorded.",
+      "evidence": "",
+      "item_id": "operator_final_go",
+      "status": "PASS",
+      "title": "Final operator go/no-go"
+    }
+  ],
+  "connector": "binance",
+  "decision": "live_batch_activation_plan_approved",
+  "environment": {
+    "alert_channel_configured": true,
+    "exchange_key_env_detected": false,
+    "global_kill_switch": true,
+    "live_trading_enabled": false
+  },
+  "generated_at": "2026-04-28T02:09:30.945820+00:00",
+  "market_type": "spot",
+  "post_batch_sequence": [
+    "Export Hummingbot events and exchange fills.",
+    "Run daily report, reconciliation, and tax/trade export.",
+    "Compare Hummingbot fills against Binance fills and balances.",
+    "Document PnL, fees, slippage, alerts, and any manual intervention."
+  ],
+  "risk_controls": {
+    "auto_expand_limits": false,
+    "auto_expand_pairs": false,
+    "max_batch_notional": "500",
+    "max_batch_orders": 2,
+    "max_daily_loss": "50",
+    "max_drawdown_pct": "0.05",
+    "max_gross_notional": "1000",
+    "max_order_notional": "250",
+    "max_symbol_notional": "500",
+    "one_batch_only": true,
+    "sell_only_existing_spot_balance": true,
+    "spot_only_no_margin": true
+  },
+  "rollback_sequence": [
+    "Stop the Hummingbot container or script immediately.",
+    "Set GLOBAL_KILL_SWITCH=true and LIVE_TRADING_ENABLED=false.",
+    "Cancel any open orders in Hummingbot and confirm in the Binance spot UI.",
+    "Do not restart live trading before reconciliation is complete."
+  ],
+  "session_id": "crypto_relative_strength_v1_phase_6_4_first_live_batch_activation_plan",
+  "strategy_id": "crypto_relative_strength_v1"
+}

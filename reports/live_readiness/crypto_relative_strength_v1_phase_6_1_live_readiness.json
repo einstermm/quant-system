@@ -1,0 +1,112 @@
+{
+  "acceptance_summary": {
+    "decision": "sandbox_export_accepted_with_warnings",
+    "event_source": "hummingbot_export",
+    "exchange_key_env_detected": false,
+    "live_trading_enabled": false,
+    "session_gate_decision": "sandbox_session_ready_with_warnings"
+  },
+  "alerts": [
+    {
+      "created_at": "2026-04-28T01:15:39.307566+00:00",
+      "message": "Observation review decision is hummingbot_observation_window_ready_with_warnings.",
+      "severity": "WARN",
+      "title": "Observation review has warnings"
+    },
+    {
+      "created_at": "2026-04-28T01:15:39.307809+00:00",
+      "message": "Export acceptance decision is sandbox_export_accepted_with_warnings.",
+      "severity": "WARN",
+      "title": "Export acceptance has warnings"
+    },
+    {
+      "created_at": "2026-04-28T01:15:39.307830+00:00",
+      "message": "Daily report status is daily_report_ready_with_warnings.",
+      "severity": "WARN",
+      "title": "Daily report has warnings"
+    },
+    {
+      "created_at": "2026-04-28T01:15:39.307835+00:00",
+      "message": "Configured max_order_notional is above the Phase 6.1 initial live cap; lower it before small-funds activation.",
+      "severity": "WARN",
+      "title": "Initial live order cap high"
+    },
+    {
+      "created_at": "2026-04-28T01:15:39.307837+00:00",
+      "message": "No exchange credential environment variables were detected in this shell.",
+      "severity": "INFO",
+      "title": "No exchange keys detected"
+    },
+    {
+      "created_at": "2026-04-28T01:15:39.307838+00:00",
+      "message": "Phase 6.1 only builds readiness artifacts and does not submit orders.",
+      "severity": "INFO",
+      "title": "No live orders submitted"
+    }
+  ],
+  "artifacts": {
+    "acceptance_json": "reports/hummingbot_sandbox/crypto_relative_strength_v1_phase_5_10_export_acceptance/acceptance.json",
+    "daily_report_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_1_daily_report.json",
+    "observation_review_json": "reports/hummingbot_sandbox/crypto_relative_strength_v1_phase_5_10_observation_review.json",
+    "risk_yml": "strategies/crypto_relative_strength_v1/risk.yml"
+  },
+  "daily_report_summary": {
+    "alert_count": 1,
+    "filled_orders": 8,
+    "quote_balance_delta": "-986.23283690949096238402723",
+    "status": "daily_report_ready_with_warnings",
+    "total_fee_quote": "1.959705403998000008573058651"
+  },
+  "decision": "live_preflight_ready_with_warnings",
+  "environment": {
+    "alert_channel_configured": true,
+    "exchange_key_env_detected": false,
+    "global_kill_switch": true,
+    "hummingbot_api_base_url_configured": true,
+    "live_trading_enabled": false
+  },
+  "generated_at": "2026-04-28T01:15:39.307842+00:00",
+  "observation_summary": {
+    "canceled_orders": 0,
+    "decision": "hummingbot_observation_window_ready_with_warnings",
+    "duration_hours": "2.00000335",
+    "event_count": 397,
+    "failed_orders": 0,
+    "filled_orders": 8,
+    "missing_terminal_orders": 0,
+    "submitted_orders": 8,
+    "terminal_orders": 8,
+    "unknown_order_ids": 0
+  },
+  "risk_limits": {
+    "max_daily_loss": "250",
+    "max_daily_loss_decimal": "250",
+    "max_drawdown_pct": "0.10",
+    "max_drawdown_pct_decimal": "0.10",
+    "max_gross_notional": "5000",
+    "max_gross_notional_decimal": "5000",
+    "max_order_notional": "1000",
+    "max_order_notional_decimal": "1000",
+    "max_symbol_notional": "5000",
+    "max_symbol_notional_decimal": "5000"
+  },
+  "runbook": [
+    "Keep LIVE_TRADING_ENABLED=false until the manual activation checklist is signed off.",
+    "Reduce initial live risk limits to the approved small-funds cap before activation.",
+    "Configure an external alert channel and verify a test alert.",
+    "Regenerate the Hummingbot handoff with a live connector only after credentials, allowlist, and kill switch are verified.",
+    "Start with one small live order batch; rerun daily report, reconciliation, and tax export immediately after completion."
+  ],
+  "session_id": "crypto_relative_strength_v1_phase_6_1_live_readiness",
+  "strategy_id": "crypto_relative_strength_v1",
+  "thresholds": {
+    "max_canceled_orders": 0,
+    "max_failed_orders": 0,
+    "max_initial_live_order_notional": "250",
+    "max_missing_terminal_orders": 0,
+    "max_unknown_order_ids": 0,
+    "min_observation_hours": "2",
+    "require_global_kill_switch": true,
+    "require_live_disabled": true
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "alerts": [
+    {
+      "created_at": "2026-04-27T17:37:55.120805+00:00",
+      "message": "Observation review warnings are carried into this daily report.",
+      "severity": "WARN",
+      "title": "Observation warnings carried"
+    }
+  ],
+  "artifacts": {
+    "events_jsonl": "/Users/albertlz/Downloads/private_proj/hummingbot/data/crypto_relative_strength_v1_phase_5_10_r2_hummingbot_events.jsonl",
+    "observation_review_json": "reports/hummingbot_sandbox/crypto_relative_strength_v1_phase_5_10_observation_review.json"
+  },
+  "balance_summary": {
+    "assets": [
+      "ADA",
+      "BTC",
+      "DOGE",
+      "ETH",
+      "HBOT",
+      "SOL",
+      "USDC",
+      "USDT",
+      "WETH",
+      "XRP"
+    ],
+    "balance_deltas": {
+      "ADA": "0.0000000000",
+      "BTC": "0.0064331604",
+      "DOGE": "0",
+      "ETH": "0",
+      "HBOT": "0",
+      "SOL": "0",
+      "USDC": "0",
+      "USDT": "-986.23283690949096238402723",
+      "WETH": "0",
+      "XRP": "0.0000000000"
+    },
+    "ending_balances": {
+      "ADA": "1987.5141075888",
+      "BTC": "1.0064331604",
+      "DOGE": "1000000",
+      "ETH": "20",
+      "HBOT": "10000000",
+      "SOL": "100",
+      "USDC": "100000",
+      "USDT": "99013.76716309050903761597277",
+      "WETH": "20",
+      "XRP": "0.3504806758"
+    },
+    "quote_asset": "USDT",
+    "quote_balance_delta": "-986.23283690949096238402723",
+    "starting_balances": {
+      "ADA": "1987.5141075888",
+      "BTC": "1",
+      "DOGE": "1000000",
+      "ETH": "20",
+      "HBOT": "10000000",
+      "SOL": "100",
+      "USDC": "100000",
+      "USDT": "100000",
+      "WETH": "20",
+      "XRP": "0.3504806758"
+    }
+  },
+  "carried_warnings": [
+    {
+      "message": "Acceptance decision is sandbox_export_accepted_with_warnings.",
+      "severity": "WARN",
+      "title": "Acceptance has warnings"
+    },
+    {
+      "message": "Reconciliation decision is sandbox_reconciled_with_warnings.",
+      "severity": "WARN",
+      "title": "Reconciliation has warnings"
+    },
+    {
+      "message": "Carry forward Hummingbot paper amount adjustment warnings.",
+      "severity": "WARN",
+      "title": "Submitted amount adjusted"
+    },
+    {
+      "message": "Carry forward fill price drift warnings into the next runbook.",
+      "severity": "WARN",
+      "title": "Fill price drift"
+    },
+    {
+      "message": "Carry forward Hummingbot paper fee drift warnings into the next runbook.",
+      "severity": "WARN",
+      "title": "Fee drift"
+    },
+    {
+      "message": "Hummingbot paper account balances were exported but not quantity-reconciled.",
+      "severity": "WARN",
+      "title": "Balance reconciliation skipped"
+    }
+  ],
+  "event_window": {
+    "completed_at": "2026-04-27T17:18:19.013944+00:00",
+    "duration_hours": "2.00000335",
+    "event_count": 397,
+    "event_counts": {
+      "balance": 258,
+      "filled": 8,
+      "heartbeat": 121,
+      "session_completed": 1,
+      "session_started": 1,
+      "submitted": 8
+    },
+    "started_at": "2026-04-27T15:18:19.001884+00:00"
+  },
+  "generated_at": "2026-04-27T17:37:55.121310+00:00",
+  "session_id": "crypto_relative_strength_v1_phase_6_1_daily_report",
+  "status": "daily_report_ready_with_warnings",
+  "strategy_id": "crypto_relative_strength_v1",
+  "trading_summary": {
+    "buy_notional_quote": "1472.725630567030000474493660",
+    "buy_orders": 6,
+    "filled_orders": 8,
+    "gross_notional_quote": "1959.705403998000008573058651",
+    "net_quote_trade_flow_after_fees": "-987.7055625400579923845017273",
+    "sell_notional_quote": "486.9797734309700080985649914",
+    "sell_orders": 2,
+    "submitted_orders": 8,
+    "total_fee_quote": "1.959705403998000008573058651"
+  }
+}

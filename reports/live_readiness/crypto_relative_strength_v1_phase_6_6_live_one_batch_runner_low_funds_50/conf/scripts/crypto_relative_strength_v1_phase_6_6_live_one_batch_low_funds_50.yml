@@ -1,0 +1,30 @@
+script_file_name: "quant_system_live_one_batch.py"
+connector_name: "binance"
+event_log_path: "/home/hummingbot/data/crypto_relative_strength_v1_phase_6_6_live_one_batch_low_funds_50_events.jsonl"
+live_order_submission_armed: true
+exchange_state_confirmed: true
+allowed_pairs:
+  - "BTC-USDT"
+  - "ETH-USDT"
+max_batch_notional: "50"
+max_order_notional: "50"
+quote_balance_safety_factor: "1.02"
+amount_safety_factor: "0.99"
+max_price_deviation_pct: "0.02"
+order_interval_seconds: "5"
+heartbeat_interval_seconds: "10"
+balance_snapshot_interval_seconds: "30"
+observation_min_runtime_seconds: "30"
+stop_after_terminal_orders: true
+script_config_name: "crypto_relative_strength_v1_phase_6_6_live_one_batch_low_funds_50.yml"
+orders:
+  -
+    client_order_id: "crypto_relative_strength_v1_first_live_batch_001_low_funds_50-btc_usdt-1"
+    trading_pair: "BTC-USDT"
+    side: "buy"
+    order_type: "market"
+    requested_quote_notional: "50"
+    estimated_price: "77371.32000000"
+    estimated_quantity: "0.0006462342893981904405921987631"
+    signal_momentum: "0.034237807009464912373334096"
+    signal_timestamp: "2026-04-27T20:00:00+00:00"

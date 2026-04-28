@@ -1,0 +1,38 @@
+{
+  "account_id": "paper-main-hummingbot",
+  "alerts": [
+    {
+      "created_at": "2026-04-27T17:47:00.167209+00:00",
+      "message": "FX source is suitable for pipeline validation only, not final tax filing.",
+      "severity": "WARN",
+      "title": "Validation FX source"
+    },
+    {
+      "created_at": "2026-04-27T17:47:00.167391+00:00",
+      "message": "Sell rows need adjusted cost base lot matching before Canadian tax filing.",
+      "severity": "WARN",
+      "title": "ACB lot matching required"
+    }
+  ],
+  "artifacts": {
+    "events_jsonl": "/Users/albertlz/Downloads/private_proj/hummingbot/data/crypto_relative_strength_v1_phase_5_10_r2_hummingbot_events.jsonl",
+    "tax_export_csv": "reports/live_readiness/crypto_relative_strength_v1_phase_6_2_trade_tax_export.csv"
+  },
+  "cad_fx_rate": "1",
+  "fx_source": "validation_only_not_tax_filing",
+  "generated_at": "2026-04-27T17:47:00.167394+00:00",
+  "quote_asset": "USDT",
+  "row_count": 8,
+  "source": "hummingbot_export",
+  "status": "tax_export_ready_with_warnings",
+  "strategy_id": "crypto_relative_strength_v1",
+  "totals": {
+    "cost_basis_cad": "1474.198356197597030474968153",
+    "cost_basis_quote": "1474.198356197597030474968153",
+    "fee_quote": "1.959705403998000008573058651",
+    "fees_cad": "1.959705403998000008573058651",
+    "notional_quote": "1959.705403998000008573058651",
+    "proceeds_cad": "486.4927936575390380904664264",
+    "proceeds_quote": "486.4927936575390380904664264"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "abnormal_open_orders_found": false,
+  "account_id": "binance-main-spot",
+  "checked_at": "2026-04-28T02:55:38+00:00",
+  "checked_by": "operator",
+  "connector": "binance",
+  "evidence": "Operator confirmed manual Binance spot open orders check completed; no abnormal open orders found.",
+  "market_type": "spot",
+  "scope": "BTC-USDT, ETH-USDT and account-level open orders after Phase 6.6 first live batch",
+  "session_id": "crypto_relative_strength_v1_phase_6_8_manual_open_orders_check_low_funds_50",
+  "strategy_id": "crypto_relative_strength_v1"
+}

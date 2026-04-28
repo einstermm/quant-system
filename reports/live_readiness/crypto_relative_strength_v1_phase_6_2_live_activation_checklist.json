@@ -1,0 +1,107 @@
+{
+  "artifacts": {
+    "daily_report_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_1_daily_report.json",
+    "live_readiness_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_1_live_readiness.json",
+    "live_risk_yml": "strategies/crypto_relative_strength_v1/risk.live.phase_6_2.yml",
+    "tax_export_summary_json": "reports/live_readiness/crypto_relative_strength_v1_phase_6_2_trade_tax_export_summary.json"
+  },
+  "checklist": [
+    {
+      "details": "Live readiness decision is live_preflight_ready_with_warnings.",
+      "evidence": "reports/hummingbot_sandbox/crypto_relative_strength_v1_phase_5_10_observation_review.json",
+      "item_id": "phase_6_1_readiness",
+      "status": "PASS",
+      "title": "Phase 6.1 readiness available"
+    },
+    {
+      "details": "Daily report status is daily_report_ready_with_warnings.",
+      "evidence": "",
+      "item_id": "daily_report",
+      "status": "PASS",
+      "title": "Daily report generated"
+    },
+    {
+      "details": "Tax export status is tax_export_ready_with_warnings; rows=8, expected_filled_orders=8.",
+      "evidence": "",
+      "item_id": "tax_export",
+      "status": "PASS",
+      "title": "Trade tax export generated"
+    },
+    {
+      "details": "max_order_notional=250; approved_initial_cap=250.",
+      "evidence": "",
+      "item_id": "live_risk_cap",
+      "status": "PASS",
+      "title": "Strict live risk cap configured"
+    },
+    {
+      "details": "LIVE_TRADING_ENABLED must stay false until final manual signoff.",
+      "evidence": "",
+      "item_id": "live_disabled",
+      "status": "PASS",
+      "title": "Live trading remains disabled"
+    },
+    {
+      "details": "GLOBAL_KILL_SWITCH must stay true before activation.",
+      "evidence": "",
+      "item_id": "kill_switch_enabled",
+      "status": "PASS",
+      "title": "Global kill switch enabled"
+    },
+    {
+      "details": "Configure and verify at least one alert channel before live activation.",
+      "evidence": "",
+      "item_id": "alert_channel",
+      "status": "PASS",
+      "title": "External alert channel configured"
+    },
+    {
+      "details": "Confirm exchange keys are read-only/spot-trading scoped as intended, withdrawal disabled, and IP allowlist enabled where supported.",
+      "evidence": "",
+      "item_id": "credential_scope",
+      "status": "PASS",
+      "title": "Credential scope reviewed"
+    },
+    {
+      "details": "Confirm allowed symbols, quote asset, account, and connector are exactly the Phase 6 activation target.",
+      "evidence": "",
+      "item_id": "exchange_allowlist",
+      "status": "PASS",
+      "title": "Exchange allowlist reviewed"
+    },
+    {
+      "details": "Human operator signs off the first live order batch size, kill switch procedure, and rollback plan.",
+      "evidence": "",
+      "item_id": "operator_signoff",
+      "status": "PASS",
+      "title": "Operator activation signoff"
+    }
+  ],
+  "decision": "live_activation_ready",
+  "environment": {
+    "alert_channel_configured": true,
+    "exchange_key_env_detected": false,
+    "global_kill_switch": true,
+    "live_trading_enabled": false
+  },
+  "generated_at": "2026-04-28T01:29:13.774801+00:00",
+  "risk_summary": {
+    "max_daily_loss": "50",
+    "max_daily_loss_decimal": "50",
+    "max_drawdown_pct": "0.05",
+    "max_drawdown_pct_decimal": "0.05",
+    "max_gross_notional": "1000",
+    "max_gross_notional_decimal": "1000",
+    "max_order_notional": "250",
+    "max_order_notional_decimal": "250",
+    "max_symbol_notional": "500",
+    "max_symbol_notional_decimal": "500"
+  },
+  "runbook": [
+    "Enable live trading only for the approved small-funds batch.",
+    "Submit one controlled live batch and immediately rerun daily report, reconciliation, and tax export.",
+    "If any alert fires, activate kill switch and follow the risk-off runbook."
+  ],
+  "session_id": "crypto_relative_strength_v1_phase_6_2_live_activation_checklist",
+  "strategy_id": "crypto_relative_strength_v1"
+}

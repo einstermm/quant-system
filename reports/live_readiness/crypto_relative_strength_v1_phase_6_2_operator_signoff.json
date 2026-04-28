@@ -1,0 +1,26 @@
+{
+  "api_configuration_phase": "Phase 6.3",
+  "automation_scope": "single small-funds live batch only; no automatic expansion",
+  "confirmed_limits": {
+    "max_daily_loss": "50",
+    "max_drawdown_pct": "0.05",
+    "max_gross_notional": "1000",
+    "max_order_notional": "250",
+    "max_symbol_notional": "500"
+  },
+  "decision": "operator_signoff_confirmed",
+  "emergency_action": "execute kill switch / stop Hummingbot container",
+  "first_live_allowlist": [
+    "BTC-USDT",
+    "ETH-USDT"
+  ],
+  "generated_at": "2026-04-28T01:29:13.700680+00:00",
+  "operator_signoff_text": "我确认首次 live 最大单笔 250 USDT，\n最大单币种 500 USDT，\n最大总敞口 1000 USDT，\n最大日亏损 50 USDT，\n最大回撤 5%，\n首次交易对仅 BTC-USDT、ETH-USDT，\n首次只运行一批小资金 live batch，\n不自动扩大交易对或额度，\n如出现异常我会立即执行 kill switch / 停止 Hummingbot 容器，\n停止后先做日报、reconciliation 和 tax/trade export，\nAPI 配置留到 Phase 6.3。",
+  "post_stop_actions": [
+    "daily report",
+    "reconciliation",
+    "tax/trade export"
+  ],
+  "session_id": "crypto_relative_strength_v1_phase_6_2_operator_signoff",
+  "strategy_id": "crypto_relative_strength_v1"
+}

@@ -1,0 +1,51 @@
+{
+  "account_id": "binance-main-spot",
+  "alerts": [
+    {
+      "created_at": "2026-04-28T02:44:55.869378+00:00",
+      "message": "Hummingbot completed the live order, but the MQTT bridge failed to connect during the run.",
+      "severity": "WARN",
+      "title": "MQTT bridge unavailable"
+    },
+    {
+      "created_at": "2026-04-28T02:44:55.869396+00:00",
+      "message": "Tax export uses validation-only FX/source assumptions and is not final tax filing output.",
+      "severity": "WARN",
+      "title": "Validation tax export"
+    }
+  ],
+  "balance_summary": {
+    "base_delta": "0.00063936",
+    "ending_balances": {
+      "BTC": "0.00074442",
+      "USDT": "13.66945000"
+    },
+    "mismatches": [],
+    "quote_delta": "-49.26688000",
+    "starting_balances": {
+      "BTC": "0.00010506",
+      "USDT": "62.93633000"
+    }
+  },
+  "event_counts": {
+    "balance": 3016,
+    "filled": 1,
+    "heartbeat": 2,
+    "session_completed": 1,
+    "session_started": 1,
+    "submitted": 1
+  },
+  "generated_at": "2026-04-28T02:44:55.869401+00:00",
+  "session_id": "crypto_relative_strength_v1_phase_6_7_live_post_trade_low_funds_50",
+  "status": "live_post_trade_reconciled_with_warnings",
+  "strategy_id": "crypto_relative_strength_v1",
+  "trading_summary": {
+    "average_price_quote": "76979.5",
+    "fee_quote_estimate": "0.049266880",
+    "filled_orders": 1,
+    "gross_base_quantity": "0.00064",
+    "gross_quote_notional": "49.266880",
+    "net_base_quantity": "0.00063936",
+    "submitted_orders": 1
+  }
+}
