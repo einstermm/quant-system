@@ -1,6 +1,40 @@
 # Deployment
 
-当前只提供本地基础设施：
+当前提供本地基础设施和单容器 Web 部署入口。
+
+## Web Container
+
+构建并启动 Web API + 静态前端：
+
+```bash
+docker compose up --build web
+```
+
+访问入口：
+
+- API 信息页：`http://127.0.0.1:8000/`
+- 前端页面：`http://127.0.0.1:8000/app`
+- 部署状态：`http://127.0.0.1:8000/api/deployment/status`
+
+运行目录挂载：
+
+- `./data:/app/data`
+- `./reports:/app/reports`
+- `./logs:/app/logs`
+- `./strategies:/app/strategies:ro`
+
+部署时建议设置写操作 API key：
+
+```bash
+export QUANT_WEB_API_KEY='<replace-with-strong-key>'
+docker compose up --build web
+```
+
+容器只暴露 Web API 和静态前端，不启动 Hummingbot，也不提交真实订单。
+
+## Local Infrastructure
+
+本地数据库/缓存：
 
 ```bash
 docker compose up -d postgres redis

@@ -20,6 +20,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Generate a paper trading readiness report.")
     parser.add_argument("--walk-forward-json", required=True, help="Walk-forward JSON input")
     parser.add_argument("--capacity-stress-json", help="Optional high-equity stress backtest JSON")
+    parser.add_argument("--candidate-review-json", help="Confirmed Web candidate review JSON")
+    parser.add_argument("--candidate-backtest-json", help="Confirmed candidate backtest result JSON")
     parser.add_argument("--output-json", required=True, help="Output readiness JSON")
     parser.add_argument("--output-md", required=True, help="Output readiness Markdown")
     parser.add_argument("--runbook-md", required=True, help="Output risk-off runbook Markdown")
@@ -39,6 +41,12 @@ def main() -> None:
         walk_forward_payload=load_json(Path(args.walk_forward_json)),
         capacity_stress_payload=load_json(Path(args.capacity_stress_json))
         if args.capacity_stress_json
+        else None,
+        candidate_review_payload=load_json(Path(args.candidate_review_json))
+        if args.candidate_review_json
+        else None,
+        candidate_backtest_payload=load_json(Path(args.candidate_backtest_json))
+        if args.candidate_backtest_json
         else None,
         thresholds=thresholds,
     )

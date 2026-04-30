@@ -37,6 +37,48 @@ class PaperReadinessTest(TestCase):
         self.assertEqual("blocked", report.status)
         self.assertTrue(any(alert.title == "Capacity below minimum" for alert in report.alerts))
 
+    def test_links_confirmed_candidate_backtest(self) -> None:
+        report = build_paper_readiness_report(
+            walk_forward_payload=_walk_forward_payload(),
+            candidate_review_payload={
+                "job_id": "job_1",
+                "selected_at": "2026-04-29T00:00:00+00:00",
+                "artifact_path": "reports/web_jobs/job_1/backtest.json",
+                "strategy_id": "crypto_relative_strength_v1",
+            },
+            candidate_backtest_payload={
+                "strategy_id": "crypto_relative_strength_v1",
+                "parameters": {"start": "2025-01-01", "end": "2025-02-01"},
+                "metrics": {
+                    "total_return": "0.04",
+                    "max_drawdown": "0.03",
+                    "tail_loss": "0.01",
+                    "trade_count": 4,
+                },
+            },
+        )
+
+        self.assertEqual("job_1", report.candidate_backtest["job_id"])
+        self.assertEqual("0.04", report.candidate_backtest["metrics"]["total_return"])
+        self.assertFalse(any(alert.title == "Candidate strategy mismatch" for alert in report.alerts))
+
+    def test_blocks_when_candidate_strategy_does_not_match_walk_forward(self) -> None:
+        report = build_paper_readiness_report(
+            walk_forward_payload=_walk_forward_payload(),
+            candidate_review_payload={
+                "job_id": "job_1",
+                "artifact_path": "reports/web_jobs/job_1/backtest.json",
+                "strategy_id": "crypto_momentum_v1",
+            },
+            candidate_backtest_payload={
+                "strategy_id": "crypto_momentum_v1",
+                "metrics": {"total_return": "0.01", "max_drawdown": "0.03", "tail_loss": "0.01"},
+            },
+        )
+
+        self.assertEqual("blocked", report.status)
+        self.assertTrue(any(alert.title == "Candidate strategy mismatch" for alert in report.alerts))
+
     def test_writes_report_outputs(self) -> None:
         report = build_paper_readiness_report(walk_forward_payload=_walk_forward_payload())
 
@@ -50,6 +92,7 @@ class PaperReadinessTest(TestCase):
             runbook = runbook_path.read_text(encoding="utf-8")
 
         self.assertEqual(report.status, payload["status"])
+        self.assertIn("candidate_backtest", payload)
         self.assertIn("Paper Readiness Report", markdown)
         self.assertIn("Risk-Off Recovery Runbook", runbook)
 

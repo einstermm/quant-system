@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
@@ -49,6 +49,7 @@ class PaperReadinessReport:
     status: str
     summary: dict[str, Decimal | int]
     capacity: dict[str, Decimal | int]
+    candidate_backtest: dict[str, object] | None
     thresholds: PaperReadinessThresholds
     alerts: tuple[Alert, ...]
     recommended_actions: tuple[str, ...]
@@ -61,6 +62,7 @@ class PaperReadinessReport:
             "status": self.status,
             "summary": _decimal_dict(self.summary),
             "capacity": _decimal_dict(self.capacity),
+            "candidate_backtest": self.candidate_backtest,
             "thresholds": self.thresholds.to_dict(),
             "alerts": [alert.to_dict() for alert in self.alerts],
             "recommended_actions": list(self.recommended_actions),
@@ -93,9 +95,32 @@ class PaperReadinessReport:
             f"- Risk-off bars: `{self.capacity['risk_off_bars_sum']}`",
             f"- Recovery bars: `{self.capacity['recovery_bars_sum']}`",
             "",
-            "## Alerts",
+            "## Confirmed Candidate Backtest",
             "",
         ]
+        if self.candidate_backtest:
+            candidate = self.candidate_backtest
+            metrics = _dict(candidate.get("metrics"))
+            lines.extend(
+                [
+                    f"- Candidate job: `{candidate.get('job_id', '')}`",
+                    f"- Candidate strategy: `{candidate.get('strategy_id', '')}`",
+                    f"- Backtest artifact: `{candidate.get('artifact_path', '')}`",
+                    f"- Total return: `{metrics.get('total_return', '')}`",
+                    f"- Max drawdown: `{metrics.get('max_drawdown', '')}`",
+                    f"- Tail loss: `{metrics.get('tail_loss', '')}`",
+                    "",
+                ]
+            )
+        else:
+            lines.extend(["- None linked.", ""])
+
+        lines.extend(
+            [
+                "## Alerts",
+                "",
+            ]
+        )
         if self.alerts:
             lines.extend(
                 f"- `{alert.severity}` {alert.title}: {alert.message}"
@@ -115,11 +140,23 @@ def build_paper_readiness_report(
     walk_forward_payload: dict[str, Any],
     thresholds: PaperReadinessThresholds | None = None,
     capacity_stress_payload: dict[str, Any] | None = None,
+    candidate_review_payload: dict[str, Any] | None = None,
+    candidate_backtest_payload: dict[str, Any] | None = None,
 ) -> PaperReadinessReport:
     limits = thresholds or PaperReadinessThresholds()
     summary = _summary_metrics(walk_forward_payload)
     capacity = _capacity_metrics(walk_forward_payload, capacity_stress_payload)
-    alerts = _build_alerts(summary=summary, capacity=capacity, thresholds=limits)
+    candidate_backtest = _candidate_backtest_summary(
+        candidate_review_payload=candidate_review_payload,
+        candidate_backtest_payload=candidate_backtest_payload,
+    )
+    alerts = _build_alerts(
+        summary=summary,
+        capacity=capacity,
+        thresholds=limits,
+        walk_forward_strategy_id=str(walk_forward_payload["strategy_id"]),
+        candidate_backtest=candidate_backtest,
+    )
     status = _status(alerts)
     return PaperReadinessReport(
         strategy_id=str(walk_forward_payload["strategy_id"]),
@@ -128,6 +165,7 @@ def build_paper_readiness_report(
         status=status,
         summary=summary,
         capacity=capacity,
+        candidate_backtest=candidate_backtest,
         thresholds=limits,
         alerts=tuple(alerts),
         recommended_actions=_recommended_actions(status, alerts),
@@ -213,7 +251,7 @@ def _summary_metrics(payload: dict[str, Any]) -> dict[str, Decimal | int]:
         "worst_selected_test_return": Decimal(str(raw["worst_selected_test_return"])),
         "best_selected_test_return": Decimal(str(raw["best_selected_test_return"])),
         "worst_selected_test_drawdown": Decimal(str(raw["worst_selected_test_drawdown"])),
-        "worst_selected_test_tail_loss": Decimal(str(raw["worst_selected_test_tail_loss"])),
+        "worst_selected_test_tail_loss": Decimal(str(raw.get("worst_selected_test_tail_loss", "0"))),
     }
 
 
@@ -222,27 +260,21 @@ def _capacity_metrics(
     capacity_stress_payload: dict[str, Any] | None,
 ) -> dict[str, Decimal | int]:
     test_metrics = [fold["selected_run"]["test_metrics"] for fold in payload["folds"]]
-    max_participation = max(
-        Decimal(str(metrics["max_observed_participation_rate"]))
-        for metrics in test_metrics
-    )
-    min_capacity = min(
-        Decimal(str(metrics["estimated_participation_capacity_equity"]))
-        for metrics in test_metrics
-    )
+    max_participation = max(_metric_decimal(metrics, "max_observed_participation_rate") for metrics in test_metrics)
+    min_capacity = min(_metric_decimal(metrics, "estimated_participation_capacity_equity") for metrics in test_metrics)
     capacity: dict[str, Decimal | int] = {
         "max_observed_participation_rate": max_participation,
         "min_estimated_capacity_equity": min_capacity,
         "participation_capped_count_sum": sum(
-            int(metrics["participation_capped_count"]) for metrics in test_metrics
+            _metric_int(metrics, "participation_capped_count") for metrics in test_metrics
         ),
         "min_order_skipped_count_sum": sum(
-            int(metrics["min_order_skipped_count"]) for metrics in test_metrics
+            _metric_int(metrics, "min_order_skipped_count") for metrics in test_metrics
         ),
-        "risk_off_bars_sum": sum(int(metrics["risk_off_bars"]) for metrics in test_metrics),
-        "recovery_bars_sum": sum(int(metrics["recovery_bars"]) for metrics in test_metrics),
+        "risk_off_bars_sum": sum(_metric_int(metrics, "risk_off_bars") for metrics in test_metrics),
+        "recovery_bars_sum": sum(_metric_int(metrics, "recovery_bars") for metrics in test_metrics),
         "drawdown_stop_count_sum": sum(
-            int(metrics["drawdown_stop_count"]) for metrics in test_metrics
+            _metric_int(metrics, "drawdown_stop_count") for metrics in test_metrics
         ),
     }
     if capacity_stress_payload is not None:
@@ -256,11 +288,49 @@ def _capacity_metrics(
     return capacity
 
 
+def _candidate_backtest_summary(
+    *,
+    candidate_review_payload: dict[str, Any] | None,
+    candidate_backtest_payload: dict[str, Any] | None,
+) -> dict[str, object] | None:
+    if candidate_review_payload is None and candidate_backtest_payload is None:
+        return None
+
+    review = candidate_review_payload or {}
+    backtest = candidate_backtest_payload or {}
+    metrics = _dict(backtest.get("metrics")) or _dict(review.get("metrics"))
+    parameters = _dict(backtest.get("parameters")) or _dict(review.get("parameters"))
+    strategy_id = str(backtest.get("strategy_id") or review.get("strategy_id", ""))
+    return {
+        "job_id": str(review.get("job_id", "")),
+        "selected_at": str(review.get("selected_at", "")),
+        "artifact_path": str(review.get("artifact_path", "")),
+        "strategy_id": strategy_id,
+        "parameters": {str(key): str(value) for key, value in parameters.items()},
+        "metrics": {
+            key: str(metrics[key])
+            for key in (
+                "start_equity",
+                "end_equity",
+                "total_return",
+                "max_drawdown",
+                "tail_loss",
+                "turnover",
+                "trade_count",
+                "total_fees",
+            )
+            if key in metrics
+        },
+    }
+
+
 def _build_alerts(
     *,
     summary: dict[str, Decimal | int],
     capacity: dict[str, Decimal | int],
     thresholds: PaperReadinessThresholds,
+    walk_forward_strategy_id: str,
+    candidate_backtest: dict[str, object] | None,
 ) -> list[Alert]:
     alerts: list[Alert] = []
     if summary["positive_fold_ratio"] < thresholds.min_positive_fold_ratio:
@@ -291,6 +361,40 @@ def _build_alerts(
         alerts.append(warning_alert("Risk-off observed", "Selected test folds entered risk-off; recovery runbook is required."))
     if capacity.get("stress_participation_capped_count", 0) > 0:
         alerts.append(warning_alert("Capacity stress capped orders", "Larger capital stress run hit participation caps."))
+    if candidate_backtest is not None:
+        metrics = _dict(candidate_backtest.get("metrics"))
+        candidate_strategy = str(candidate_backtest.get("strategy_id", ""))
+        if candidate_strategy and candidate_strategy != walk_forward_strategy_id:
+            alerts.append(
+                critical_alert(
+                    "Candidate strategy mismatch",
+                    "Confirmed backtest candidate does not match the walk-forward readiness strategy.",
+                )
+            )
+        total_return = _optional_decimal(metrics.get("total_return"))
+        if total_return is not None and total_return < -thresholds.max_worst_return_loss:
+            alerts.append(
+                critical_alert(
+                    "Candidate backtest loss too large",
+                    "Confirmed candidate backtest breached the allowed loss threshold.",
+                )
+            )
+        max_drawdown = _optional_decimal(metrics.get("max_drawdown"))
+        if max_drawdown is not None and max_drawdown > thresholds.max_worst_drawdown:
+            alerts.append(
+                critical_alert(
+                    "Candidate drawdown too large",
+                    "Confirmed candidate backtest breached the drawdown threshold.",
+                )
+            )
+        tail_loss = _optional_decimal(metrics.get("tail_loss"))
+        if tail_loss is not None and tail_loss > thresholds.max_worst_tail_loss:
+            alerts.append(
+                critical_alert(
+                    "Candidate tail loss too large",
+                    "Confirmed candidate backtest breached the tail-loss threshold.",
+                )
+            )
     if not alerts:
         alerts.append(info_alert("Paper readiness checks passed", "No blocking paper readiness issues detected."))
     return alerts
@@ -318,7 +422,30 @@ def _recommended_actions(status: str, alerts: tuple[Alert, ...] | list[Alert]) -
         actions.append("Follow the generated risk-off recovery runbook before resuming after a stop.")
     if any(alert.title == "Capacity stress capped orders" for alert in alerts):
         actions.append("Do not scale capital above estimated participation capacity without new execution assumptions.")
+    if any(alert.title == "Candidate strategy mismatch" for alert in alerts):
+        actions.append("Regenerate walk-forward and capacity evidence for the confirmed candidate strategy before paper.")
     return tuple(actions)
+
+
+def _dict(value: object) -> dict[str, Any]:
+    return value if isinstance(value, dict) else {}
+
+
+def _optional_decimal(value: object) -> Decimal | None:
+    if value is None:
+        return None
+    try:
+        return Decimal(str(value))
+    except (InvalidOperation, ValueError):
+        return None
+
+
+def _metric_decimal(metrics: dict[str, Any], key: str, default: str = "0") -> Decimal:
+    return Decimal(str(metrics.get(key, default)))
+
+
+def _metric_int(metrics: dict[str, Any], key: str, default: int = 0) -> int:
+    return int(metrics.get(key, default))
 
 
 def _decimal_dict(values: dict[str, Decimal | int]) -> dict[str, object]:

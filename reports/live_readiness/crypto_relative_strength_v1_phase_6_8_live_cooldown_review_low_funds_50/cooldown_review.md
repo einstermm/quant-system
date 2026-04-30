@@ -1,7 +1,7 @@
 # Phase 6.8 Live Cooldown Review
 
-- Generated at: `2026-04-28T02:57:41.655817+00:00`
-- Status: `live_cooldown_active_with_warnings`
+- Generated at: `2026-04-29T12:34:03.247655+00:00`
+- Status: `live_cooldown_elapsed_with_warnings`
 - Session id: `crypto_relative_strength_v1_phase_6_8_live_cooldown_review_low_funds_50`
 - Strategy: `crypto_relative_strength_v1`
 - Account: `binance-main-spot`
@@ -10,9 +10,9 @@
 
 - Completed at: `2026-04-28T02:34:33.175500+00:00`
 - Minimum cooldown hours: `24`
-- Elapsed hours: `0.3856889769444444444444444444`
+- Elapsed hours: `33.99168670972222222222222222`
 - Next review not before: `2026-04-29T02:34:33.175500+00:00`
-- Cooldown elapsed: `False`
+- Cooldown elapsed: `True`
 
 ## Post Trade
 
@@ -32,8 +32,8 @@
 
 ## Operational
 
-- Runner container status: `not_found`
-- Hummingbot container status: `Exited (137) 27 minutes ago`
+- Runner container status: `docker_status_unavailable: failed to connect to the docker API at unix:///Users/albertlz/.docker/run/docker.sock; check if the path is correct and if the daemon is running: dial unix /Users/albertlz/.docker/run/docker.sock: connect: no such file or directory`
+- Hummingbot container status: `docker_status_unavailable: failed to connect to the docker API at unix:///Users/albertlz/.docker/run/docker.sock; check if the path is correct and if the daemon is running: dial unix /Users/albertlz/.docker/run/docker.sock: connect: no such file or directory`
 - Event log lines: `3022`
 - Event log last event: `session_completed`
 - Runner config armed: `False`
@@ -48,13 +48,12 @@
 
 ## Alerts
 
-- `WARN` Cooldown active: Minimum cooldown window has not elapsed; do not start another live batch.
 - `WARN` Carried post-trade warning: MQTT bridge unavailable: Hummingbot completed the live order, but the MQTT bridge failed to connect during the run.
 - `WARN` Carried post-trade warning: Validation tax export: Tax export uses validation-only FX/source assumptions and is not final tax filing output.
 
 ## Recommended Actions
 
-- Do not run another live batch until the cooldown window has elapsed.
+- Cooldown elapsed; perform a manual operator review before any new activation.
 - Do not expand beyond BTC-USDT / ETH-USDT or the 50 USDT low-funds cap.
 - Open orders manual check is complete; keep the evidence with Phase 6.8 artifacts.
 - Keep the Phase 6.6 one-shot runner config disarmed unless a new activation is approved.

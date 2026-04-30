@@ -1,4 +1,18 @@
 services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      QUANT_WEB_API_KEY: ${QUANT_WEB_API_KEY:-}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./reports:/app/reports
+      - ./logs:/app/logs
+      - ./strategies:/app/strategies:ro
+
   postgres:
     image: postgres:16-alpine
     environment:

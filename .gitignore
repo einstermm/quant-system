@@ -15,12 +15,19 @@ venv/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+*.egg-info/
+
+node_modules/
+dist/
 
 data/raw/
 data/reports/
 data/warehouse/
+data/web_state.sqlite
 
 reports/backtests/
 reports/paper_readiness/
 reports/paper_trading/
 reports/hummingbot_sandbox/
+reports/web_jobs/
+reports/web_reviews/

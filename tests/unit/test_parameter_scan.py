@@ -15,6 +15,7 @@ from packages.backtesting.parameter_scan import (
     write_parameter_scan_csv,
     write_parameter_scan_json,
 )
+from packages.backtesting.run_backtest import _apply_overrides
 from packages.core.models import Candle
 from packages.data.candle_repository import InMemoryCandleRepository
 from packages.data.market_data_service import MarketDataService
@@ -132,6 +133,33 @@ class ParameterScanTest(TestCase):
         self.assertEqual(1, payload["best_run"]["rank"])
         self.assertEqual(2, len(rows))
         self.assertEqual("1", rows[0]["rank"])
+
+    def test_backtest_overrides_can_replay_scan_parameters(self) -> None:
+        start = datetime(2024, 1, 1, tzinfo=UTC)
+        config = _config(start)
+
+        updated = _apply_overrides(
+            config,
+            initial_equity=None,
+            start=None,
+            end=None,
+            fee_rate="0.0006",
+            slippage_bps="2",
+            fast_window=3,
+            slow_window=6,
+            lookback_window=None,
+            top_n=None,
+            min_momentum=None,
+            min_trend_strength="0.01",
+            max_volatility="0.04",
+        )
+
+        self.assertEqual(Decimal("0.0006"), updated.fee_rate)
+        self.assertEqual(Decimal("2"), updated.slippage_bps)
+        self.assertEqual(3, updated.signal.fast_window)
+        self.assertEqual(6, updated.signal.slow_window)
+        self.assertTrue(updated.regime_filter.enabled)
+        self.assertEqual(Decimal("0.04"), updated.regime_filter.max_volatility)
 
 
 def _config(start: datetime) -> BacktestConfig:

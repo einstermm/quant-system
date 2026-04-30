@@ -16,6 +16,7 @@ def main() -> None:
     parser.add_argument("--strategy-dir", required=True, help="Strategy directory containing config.yml")
     parser.add_argument("--db", required=True, help="SQLite database path")
     parser.add_argument("--json", action="store_true", help="Print JSON instead of text summary")
+    parser.add_argument("--output-json", help="Write JSON payload to a file")
     args = parser.parse_args()
 
     strategy_config = load_strategy_data_config(Path(args.strategy_dir))
@@ -29,6 +30,10 @@ def main() -> None:
         "strategy_id": strategy_config.strategy_id,
         "results": [result.summary() for result in results.values()],
     }
+    if args.output_json:
+        output_path = Path(args.output_json)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
 
     if args.json:
         print(json.dumps(payload, indent=2, sort_keys=True))
