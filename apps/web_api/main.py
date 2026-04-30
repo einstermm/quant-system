@@ -43,6 +43,7 @@ from apps.web_api.strategy_configs import read_strategy_config
 from apps.web_api.strategy_configs import update_strategy_config
 from apps.web_api.strategy_portfolios import list_strategy_portfolios
 from apps.web_api.strategy_portfolios import upsert_strategy_portfolio
+from apps.web_api.trading_terminal import build_trading_terminal
 from apps.web_api.workflows import build_v0_workflow
 
 
@@ -126,6 +127,7 @@ def root() -> dict[str, object]:
             "deployment_status": "/api/deployment/status",
             "state_db_status": "/api/state-db/status",
             "system_status": "/api/system/status",
+            "trading_terminal": "/api/trading-terminal",
             "strategy_configs": "/api/strategy-configs",
             "strategy_portfolios": "/api/strategy-portfolios",
             "operation_guide": "/api/operation-guide",
@@ -206,6 +208,11 @@ def get_state_db_status() -> dict[str, object]:
 @app.get("/api/system/status")
 def system_status() -> dict[str, object]:
     return build_system_status()
+
+
+@app.get("/api/trading-terminal")
+def trading_terminal() -> dict[str, object]:
+    return build_trading_terminal(jobs=job_store.list_jobs())
 
 
 @app.get("/api/strategy-configs")

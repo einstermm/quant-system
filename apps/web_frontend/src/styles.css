@@ -27,6 +27,257 @@ body {
   margin-bottom: 18px;
 }
 
+.topbar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  border: 1px solid #b7c8cf;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #334852;
+  font-size: 14px;
+  font-weight: 750;
+  padding: 6px 12px;
+  text-decoration: none;
+}
+
+.page-link:hover {
+  border-color: #2d6f7a;
+  color: #2d6f7a;
+}
+
+.terminal-shell {
+  max-width: 1280px;
+}
+
+.terminal-status-band {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: start;
+  margin-bottom: 14px;
+  border: 1px solid #d7e0e4;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 18px;
+}
+
+.terminal-status-band h2 {
+  margin-bottom: 6px;
+  font-size: 22px;
+}
+
+.terminal-status-band p {
+  margin-bottom: 0;
+  color: #334852;
+}
+
+.terminal-status-band.danger {
+  border-color: #d7a0a6;
+  box-shadow: inset 4px 0 0 #c93f4a;
+}
+
+.terminal-status-band.warning {
+  border-color: #e3c46c;
+  box-shadow: inset 4px 0 0 #c28a00;
+}
+
+.terminal-status-band.success {
+  border-color: #96d0b1;
+  box-shadow: inset 4px 0 0 #1f8f5f;
+}
+
+.terminal-status-actions {
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+}
+
+.terminal-status-actions small {
+  color: #657985;
+}
+
+.terminal-safety-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.terminal-flag {
+  min-width: 0;
+  border: 1px solid #d7e0e4;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 11px;
+}
+
+.terminal-flag.ok {
+  border-color: #96d0b1;
+}
+
+.terminal-flag.blocked {
+  border-color: #d7a0a6;
+  background: #fff7f8;
+}
+
+.terminal-flag span {
+  display: block;
+  color: #657985;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.terminal-flag strong {
+  display: block;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+
+.terminal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.terminal-card {
+  min-width: 0;
+}
+
+.terminal-kv-list {
+  display: grid;
+  gap: 0;
+}
+
+.terminal-orders {
+  margin-bottom: 14px;
+}
+
+.terminal-order-list {
+  display: grid;
+  gap: 10px;
+}
+
+.terminal-order-ticket {
+  display: grid;
+  grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
+  gap: 14px;
+  border: 1px solid #d7e0e4;
+  border-radius: 8px;
+  background: #f9fbfc;
+  padding: 14px;
+}
+
+.terminal-order-ticket h3 {
+  margin: 8px 0 4px;
+  font-size: 16px;
+}
+
+.terminal-ticket-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 14px;
+}
+
+.terminal-checklist {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.terminal-checklist span {
+  min-width: 0;
+  border: 1px solid #e1e9ed;
+  border-radius: 6px;
+  background: #f9fbfc;
+  color: #334852;
+  padding: 8px;
+  overflow-wrap: anywhere;
+}
+
+.terminal-checklist strong {
+  display: block;
+  color: #172026;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.terminal-blockers {
+  display: grid;
+  gap: 8px;
+}
+
+.terminal-blocker {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  border: 1px solid #e1e9ed;
+  border-radius: 8px;
+  background: #f9fbfc;
+  padding: 10px;
+}
+
+.terminal-blocker p {
+  margin: 4px 0;
+  color: #334852;
+}
+
+.terminal-blocker small {
+  color: #657985;
+}
+
+.terminal-blocker.danger {
+  border-color: #d7a0a6;
+  background: #fff7f8;
+}
+
+.terminal-blocker.warning {
+  border-color: #e3c46c;
+  background: #fffaf0;
+}
+
+.terminal-action-list {
+  display: grid;
+  gap: 8px;
+}
+
+.terminal-action {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid #d7e0e4;
+  border-radius: 8px;
+  background: #f9fbfc;
+  padding: 12px;
+}
+
+.terminal-action strong,
+.terminal-action small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.terminal-action small {
+  margin-top: 4px;
+  color: #657985;
+  font-size: 12px;
+}
+
+.terminal-confirmation {
+  margin-top: 12px;
+}
+
 .eyebrow {
   margin: 0 0 4px;
   color: #5e7280;
@@ -1540,6 +1791,10 @@ td {
     flex-direction: column;
   }
 
+  .topbar-actions {
+    flex-wrap: wrap;
+  }
+
   .grid {
     grid-template-columns: 1fr;
   }
@@ -1570,6 +1825,13 @@ td {
   .workflow-summary,
   .workflow-layout,
   .active-jobs,
+  .terminal-status-band,
+  .terminal-safety-grid,
+  .terminal-grid,
+  .terminal-order-ticket,
+  .terminal-ticket-grid,
+  .terminal-checklist,
+  .terminal-action,
   .config-grid,
   .guide-steps,
   .detail-grid,

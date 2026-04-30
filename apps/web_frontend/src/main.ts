@@ -691,6 +691,119 @@ type LiveReadinessRecordedDisposition = {
   live_order_submission_exposed: boolean;
 };
 
+type TerminalAction = {
+  action_id: string;
+  label: string;
+  description: string;
+  safety_level: string;
+  enabled: boolean;
+  blocked_reason: string;
+};
+
+type TerminalBlocker = {
+  severity: string;
+  title: string;
+  message: string;
+  source: string;
+};
+
+type TerminalCandidateOrder = {
+  client_order_id: string;
+  trading_pair: string;
+  side: string;
+  order_type: string;
+  notional_quote: string;
+  estimated_price: string;
+  estimated_quantity: string;
+  signal_timestamp: string;
+  signal_momentum: string;
+  risk_checks: {
+    inside_allowlist: boolean;
+    max_order_notional: string;
+    max_batch_notional: string;
+    live_order_submission_armed: boolean;
+  };
+};
+
+type TradingTerminal = {
+  generated_at: string;
+  mode: {
+    status: string;
+    label: string;
+    reason: string;
+    next_live_decision: string;
+  };
+  safety: {
+    web_mode: string;
+    live_trading_enabled: boolean;
+    global_kill_switch: boolean;
+    alert_channel_configured: boolean;
+    exchange_key_env_detected: boolean;
+    live_runner_exposed: boolean;
+    live_order_submission_exposed: boolean;
+    web_can_submit_live_order: boolean;
+    live_order_submission_armed: boolean;
+    runner_package_exists: boolean;
+    runner_disarmed: boolean;
+  };
+  account: {
+    account_id: string;
+    connector: string;
+    market_type: string;
+    allowed_pairs: string[];
+  };
+  strategy: {
+    strategy_id: string;
+    signal_summary: Record<string, unknown>;
+  };
+  position: {
+    stance: string;
+    trading_pair: string;
+    strategy_net_base_quantity: string;
+    strategy_gross_base_quantity: string;
+    entry_cost_basis_quote: string;
+    entry_average_price_quote: string;
+    account_ending_base_balance: string;
+    fee_amount: string;
+    fee_asset: string;
+    exit_requires_activation: boolean;
+    exit_plan: string;
+    hold_until: string;
+  };
+  candidate_orders: {
+    package_path: string;
+    package_exists: boolean;
+    decision: string;
+    generated_at: string;
+    execution_runner_generated: boolean;
+    live_order_submission_armed: boolean;
+    orders: TerminalCandidateOrder[];
+    checklist: {item_id: string; title: string; status: string; details: string}[];
+  };
+  risk: {
+    summary: Record<string, string | number | boolean>;
+    allowed_pairs: string[];
+    checks: Record<string, string | number | boolean | string[]>;
+  };
+  execution: {
+    status: string;
+    generated_at: string;
+    order_checks: Record<string, string | number | boolean | string[]>;
+    fill_summary: Record<string, string>;
+    balance_checks: Record<string, string | Record<string, string> | string[]>;
+    operational_checks: Record<string, string | number | boolean>;
+    runner: {
+      package_exists: boolean;
+      decision: string;
+      live_order_submission_armed: boolean;
+    };
+  };
+  hummingbot: HummingbotPaperStatus;
+  blockers: TerminalBlocker[];
+  actions: TerminalAction[];
+  artifacts: Record<string, string>;
+};
+
 type ArtifactContent = {
   path: string;
   exists: boolean;
@@ -709,6 +822,7 @@ type PendingConfirmation = {
 
 type AppState = {
   status: SystemStatus;
+  tradingTerminal: TradingTerminal;
   workflow: Workflow;
   jobs: JobRecord[];
   jobQueue: JobQueueState;
@@ -753,6 +867,46 @@ loadPage().catch((error: unknown) => {
 
 appRoot.addEventListener("click", (event) => {
   const target = event.target as HTMLElement;
+  const terminalActionButton = target.closest<HTMLButtonElement>("[data-terminal-action-id]");
+  if (terminalActionButton && state) {
+    const actionId = terminalActionButton.dataset.terminalActionId ?? "";
+    const action = state.tradingTerminal.actions.find((item) => item.action_id === actionId);
+    if (!action) {
+      return;
+    }
+    if (!action.enabled) {
+      state = {
+        ...state,
+        actionMessage: `${action.label}：${action.blocked_reason || "当前不可执行。"}`,
+      };
+      renderApp(state);
+      return;
+    }
+    const activeJob = activeJobForAction(state.jobs, action.action_id);
+    if (activeJob) {
+      state = {
+        ...state,
+        selectedJob: activeJob,
+        selectedResultView: null,
+        resultViewError: "",
+        actionMessage: `${action.label} 已有运行中任务：${activeJob.job_id}`,
+      };
+      renderApp(state);
+      return;
+    }
+    state = {
+      ...state,
+      pendingConfirmation: {
+        stepId: "terminal",
+        actionId: action.action_id,
+        parameters: {},
+      },
+      actionMessage: "请确认本次终端安全动作。",
+    };
+    renderApp(state);
+    return;
+  }
+
   const readinessDispositionButton = target.closest<HTMLButtonElement>("[data-readiness-disposition-id]");
   if (readinessDispositionButton && state) {
     recordReadinessDisposition(readinessDispositionButton.dataset.readinessDispositionId ?? "").catch((error: unknown) => {
@@ -1050,9 +1204,10 @@ appRoot.addEventListener("submit", (event) => {
 });
 
 async function loadPage(): Promise<void> {
-  const {status, workflow, jobs, jobQueue, stateDb, strategyConfigs, strategyPortfolios, operationGuide, backtestResults, parameterScans, readinessDisposition, paperObservationDisposition, hummingbotPaperStatus, liveReadinessSummary} = await fetchRuntimeState();
+  const {status, tradingTerminal, workflow, jobs, jobQueue, stateDb, strategyConfigs, strategyPortfolios, operationGuide, backtestResults, parameterScans, readinessDisposition, paperObservationDisposition, hummingbotPaperStatus, liveReadinessSummary} = await fetchRuntimeState();
   state = {
     status,
+    tradingTerminal,
     workflow,
     jobs,
     jobQueue,
@@ -1082,6 +1237,7 @@ async function loadPage(): Promise<void> {
 
 async function fetchRuntimeState(): Promise<{
   status: SystemStatus;
+  tradingTerminal: TradingTerminal;
   workflow: Workflow;
   jobs: JobRecord[];
   jobQueue: JobQueueState;
@@ -1098,6 +1254,7 @@ async function fetchRuntimeState(): Promise<{
 }> {
   const [
     statusResponse,
+    tradingTerminalResponse,
     workflowResponse,
     jobsResponse,
     jobQueueResponse,
@@ -1113,6 +1270,7 @@ async function fetchRuntimeState(): Promise<{
     liveReadinessSummaryResponse,
   ] = await Promise.all([
     fetch(`${apiBase}/api/system/status`),
+    fetch(`${apiBase}/api/trading-terminal`),
     fetch(`${apiBase}/api/workflows/v0`),
     fetch(`${apiBase}/api/jobs`),
     fetch(`${apiBase}/api/jobs/queue`),
@@ -1129,6 +1287,9 @@ async function fetchRuntimeState(): Promise<{
   ]);
   if (!statusResponse.ok) {
     throw new Error(`状态 API 请求失败：${statusResponse.status} ${statusResponse.statusText}`);
+  }
+  if (!tradingTerminalResponse.ok) {
+    throw new Error(`交易终端 API 请求失败：${tradingTerminalResponse.status} ${tradingTerminalResponse.statusText}`);
   }
   if (!workflowResponse.ok) {
     throw new Error(`流程 API 请求失败：${workflowResponse.status} ${workflowResponse.statusText}`);
@@ -1175,6 +1336,7 @@ async function fetchRuntimeState(): Promise<{
     );
   }
   const status = (await statusResponse.json()) as SystemStatus;
+  const tradingTerminal = (await tradingTerminalResponse.json()) as TradingTerminal;
   const workflow = (await workflowResponse.json()) as Workflow;
   const jobsPayload = (await jobsResponse.json()) as { jobs: JobRecord[] };
   const jobQueue = (await jobQueueResponse.json()) as JobQueueState;
@@ -1188,13 +1350,13 @@ async function fetchRuntimeState(): Promise<{
   const paperObservationDisposition = (await paperObservationDispositionResponse.json()) as PaperObservationDisposition;
   const hummingbotPaperStatus = (await hummingbotPaperStatusResponse.json()) as HummingbotPaperStatus;
   const liveReadinessSummary = (await liveReadinessSummaryResponse.json()) as LiveReadinessSummary;
-  return {status, workflow, jobs: jobsPayload.jobs, jobQueue, stateDb, strategyConfigs, strategyPortfolios, operationGuide, backtestResults, parameterScans, readinessDisposition, paperObservationDisposition, hummingbotPaperStatus, liveReadinessSummary};
+  return {status, tradingTerminal, workflow, jobs: jobsPayload.jobs, jobQueue, stateDb, strategyConfigs, strategyPortfolios, operationGuide, backtestResults, parameterScans, readinessDisposition, paperObservationDisposition, hummingbotPaperStatus, liveReadinessSummary};
 }
 
 async function refreshRuntimeState(message = ""): Promise<void> {
   const previous = state;
   if (!previous) return;
-  const {status, workflow, jobs, jobQueue, stateDb, strategyConfigs, strategyPortfolios, operationGuide, backtestResults, parameterScans, readinessDisposition, paperObservationDisposition, hummingbotPaperStatus, liveReadinessSummary} = await fetchRuntimeState();
+  const {status, tradingTerminal, workflow, jobs, jobQueue, stateDb, strategyConfigs, strategyPortfolios, operationGuide, backtestResults, parameterScans, readinessDisposition, paperObservationDisposition, hummingbotPaperStatus, liveReadinessSummary} = await fetchRuntimeState();
   const stepStillExists = workflow.steps.some((step) => step.step_id === previous.selectedStepId);
   const selectedJob = previous.selectedJob
     ? jobs.find((job) => job.job_id === previous.selectedJob?.job_id) ?? previous.selectedJob
@@ -1205,6 +1367,7 @@ async function refreshRuntimeState(message = ""): Promise<void> {
   state = {
     ...previous,
     status,
+    tradingTerminal,
     workflow,
     jobs,
     jobQueue,
@@ -1607,27 +1770,29 @@ async function responseErrorMessage(response: Response, prefix: string): Promise
 }
 
 function renderLoading(): void {
+  const route = currentRoute();
   appRoot.innerHTML = `
     <section class="shell">
       <header class="topbar">
         <div>
           <p class="eyebrow">Quant System</p>
-          <h1>业务流程台</h1>
+          <h1>${route === "workflow" ? "业务流程台" : "交易终端"}</h1>
         </div>
         <span class="badge neutral">loading</span>
       </header>
-      <p class="muted">正在读取流程状态。</p>
+      <p class="muted">正在读取${route === "workflow" ? "流程状态" : "交易状态"}。</p>
     </section>
   `;
 }
 
 function renderError(message: string): void {
+  const route = currentRoute();
   appRoot.innerHTML = `
     <section class="shell">
       <header class="topbar">
         <div>
           <p class="eyebrow">Quant System</p>
-          <h1>业务流程台</h1>
+          <h1>${route === "workflow" ? "业务流程台" : "交易终端"}</h1>
         </div>
         <span class="badge danger">error</span>
       </header>
@@ -1641,6 +1806,29 @@ function renderError(message: string): void {
 }
 
 function renderApp(current: AppState): void {
+  const route = currentRoute();
+  if (route === "terminal") {
+    appRoot.innerHTML = `
+      <section class="shell terminal-shell">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Quant System</p>
+            <h1>交易终端</h1>
+          </div>
+          <div class="topbar-actions">
+            <a class="page-link" href="${pageHref("workflow")}">流程台</a>
+            <span class="badge ${terminalModeClass(current.tradingTerminal.mode.status)}">
+              ${escapeHtml(current.tradingTerminal.mode.status)}
+            </span>
+          </div>
+        </header>
+        ${renderTradingTerminal(current)}
+        ${renderArtifactViewer(current.artifact)}
+        ${renderJobDetail(current.selectedJob, current.selectedResultView, current.resultViewError)}
+      </section>
+    `;
+    return;
+  }
   const step = selectedStep(current);
   appRoot.innerHTML = `
     <section class="shell">
@@ -1649,9 +1837,12 @@ function renderApp(current: AppState): void {
           <p class="eyebrow">Quant System</p>
           <h1>${escapeHtml(current.workflow.title)}</h1>
         </div>
-        <span class="badge ${current.workflow.summary.next_live_decision.startsWith("NO_GO") ? "warning" : "success"}">
-          ${escapeHtml(current.workflow.summary.next_live_decision)}
-        </span>
+        <div class="topbar-actions">
+          <a class="page-link" href="${pageHref("terminal")}">交易终端</a>
+          <span class="badge ${current.workflow.summary.next_live_decision.startsWith("NO_GO") ? "warning" : "success"}">
+            ${escapeHtml(current.workflow.summary.next_live_decision)}
+          </span>
+        </div>
       </header>
 
       <section class="workflow-summary">
@@ -1733,6 +1924,332 @@ function renderApp(current: AppState): void {
         <h2>最近任务</h2>
         ${renderJobs(current.jobs)}
       </section>
+    </section>
+  `;
+}
+
+function renderTradingTerminal(current: AppState): string {
+  const terminal = current.tradingTerminal;
+  const signal = terminal.strategy.signal_summary;
+  const selectedPairs = Array.isArray(signal.selected_pairs) ? signal.selected_pairs.map(String).join(", ") : "";
+  const latestSignal = typeof signal.latest_signal_timestamp === "string" ? signal.latest_signal_timestamp : "";
+  return `
+    <section class="terminal-status-band ${terminalModeClass(terminal.mode.status)}">
+      <div>
+        <p class="eyebrow">Terminal Mode</p>
+        <h2>${escapeHtml(terminal.mode.label)}</h2>
+        <p>${escapeHtml(terminal.mode.reason)}</p>
+      </div>
+      <div class="terminal-status-actions">
+        <span class="badge ${terminalModeClass(terminal.mode.status)}">${escapeHtml(terminal.mode.next_live_decision || "unknown")}</span>
+        <small>刷新时间 ${escapeHtml(shortTimestamp(terminal.generated_at))}</small>
+      </div>
+    </section>
+
+    <section class="terminal-safety-grid">
+      ${terminalFlag("Live Trading", terminal.safety.live_trading_enabled, true)}
+      ${terminalFlag("Kill Switch", terminal.safety.global_kill_switch, false)}
+      ${terminalFlag("Live Runner", terminal.safety.live_runner_exposed, true)}
+      ${terminalFlag("Order Submit", terminal.safety.web_can_submit_live_order, true)}
+      ${terminalFlag("Runner Disarmed", terminal.safety.runner_disarmed, true)}
+      ${terminalFlag("Alert Channel", terminal.safety.alert_channel_configured, true)}
+    </section>
+
+    <section class="terminal-grid">
+      <article class="panel terminal-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Account</p>
+            <h2>账户与策略</h2>
+          </div>
+          <span class="badge neutral">${escapeHtml(terminal.account.connector || "connector")}</span>
+        </div>
+        <div class="terminal-kv-list">
+          ${kv("账户", terminal.account.account_id)}
+          ${kv("市场", terminal.account.market_type)}
+          ${kv("策略", terminal.strategy.strategy_id)}
+          ${kv("允许交易对", terminal.account.allowed_pairs.join(", "))}
+          ${kv("选择交易对", selectedPairs)}
+          ${kv("信号时间", shortTimestamp(latestSignal))}
+        </div>
+      </article>
+
+      <article class="panel terminal-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Position</p>
+            <h2>当前持仓</h2>
+          </div>
+          <span class="badge ${terminal.position.exit_requires_activation ? "warning" : "success"}">
+            ${terminal.position.exit_requires_activation ? "exit approval" : "exit clear"}
+          </span>
+        </div>
+        <div class="terminal-kv-list">
+          ${kv("状态", terminal.position.stance)}
+          ${kv("交易对", terminal.position.trading_pair)}
+          ${kv("净持仓", terminal.position.strategy_net_base_quantity)}
+          ${kv("账户余额", terminal.position.account_ending_base_balance)}
+          ${kv("入场成本", terminal.position.entry_cost_basis_quote)}
+          ${kv("入场均价", terminal.position.entry_average_price_quote)}
+          ${kv("持有到", terminal.position.hold_until)}
+        </div>
+      </article>
+    </section>
+
+    <section class="panel terminal-card terminal-orders">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Candidate Orders</p>
+          <h2>候选订单审批票据</h2>
+        </div>
+        <span class="badge ${terminal.candidate_orders.live_order_submission_armed ? "danger" : "neutral"}">
+          ${terminal.candidate_orders.live_order_submission_armed ? "armed" : "not armed"}
+        </span>
+      </div>
+      <p class="muted">${escapeHtml(terminal.candidate_orders.decision)}</p>
+      ${renderTerminalOrders(terminal.candidate_orders.orders)}
+      ${terminal.candidate_orders.checklist.length ? renderTerminalChecklist(terminal.candidate_orders.checklist) : ""}
+    </section>
+
+    <section class="terminal-grid">
+      <article class="panel terminal-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Risk</p>
+            <h2>风控限制</h2>
+          </div>
+          <span class="badge neutral">${escapeHtml(terminal.risk.allowed_pairs.join(", ") || "allowlist")}</span>
+        </div>
+        ${renderKeyValueEntries(terminal.risk.summary)}
+        ${renderRiskChecks(terminal.risk.checks)}
+      </article>
+
+      <article class="panel terminal-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Execution</p>
+            <h2>执行与对账</h2>
+          </div>
+          <span class="badge ${terminal.execution.status.includes("reconciled") ? "success" : "warning"}">
+            ${escapeHtml(terminal.execution.status)}
+          </span>
+        </div>
+        <div class="terminal-kv-list">
+          ${kv("Expected", String(terminal.execution.order_checks.expected_orders ?? ""))}
+          ${kv("Submitted", String(terminal.execution.order_checks.submitted_orders ?? ""))}
+          ${kv("Filled", String(terminal.execution.order_checks.filled_orders ?? ""))}
+          ${kv("DB fills", String(terminal.execution.order_checks.db_fills ?? ""))}
+          ${kv("成交金额", terminal.execution.fill_summary.gross_quote_notional)}
+          ${kv("净入账", terminal.execution.fill_summary.net_base_quantity)}
+          ${kv("成交均价", terminal.execution.fill_summary.average_price_quote)}
+          ${kv("Runner", terminal.execution.runner.live_order_submission_armed ? "armed" : "disarmed")}
+        </div>
+        ${renderOperationalChecks(terminal.execution.operational_checks)}
+      </article>
+    </section>
+
+    <section class="terminal-grid">
+      <article class="panel terminal-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Blockers</p>
+            <h2>阻断与告警</h2>
+          </div>
+          <span class="badge ${terminal.blockers.some((item) => item.severity === "CRITICAL") ? "danger" : "warning"}">
+            ${terminal.blockers.length}
+          </span>
+        </div>
+        ${renderTerminalBlockers(terminal.blockers)}
+      </article>
+
+      <article class="panel terminal-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Actions</p>
+            <h2>安全动作</h2>
+          </div>
+          <span class="badge neutral">review only</span>
+        </div>
+        ${renderTerminalActions(current)}
+        ${renderTerminalConfirmation(current)}
+        ${current.actionMessage ? `<p class="action-message">${escapeHtml(current.actionMessage)}</p>` : ""}
+      </article>
+    </section>
+
+    ${renderActiveJobs(current.jobs)}
+
+    <section class="panel full">
+      <h2>最近任务</h2>
+      ${renderJobs(current.jobs)}
+    </section>
+  `;
+}
+
+function terminalFlag(label: string, value: boolean, expectedTrue: boolean): string {
+  const ok = value === expectedTrue;
+  return `
+    <div class="terminal-flag ${ok ? "ok" : "blocked"}">
+      <span>${escapeHtml(label)}</span>
+      <strong>${value ? "true" : "false"}</strong>
+    </div>
+  `;
+}
+
+function renderTerminalOrders(orders: TerminalCandidateOrder[]): string {
+  if (!orders.length) {
+    return `<p class="muted">暂无候选订单。</p>`;
+  }
+  return `
+    <div class="terminal-order-list">
+      ${orders
+        .map(
+          (order) => `
+            <article class="terminal-order-ticket">
+              <div>
+                <span class="badge ${order.risk_checks.inside_allowlist ? "success" : "danger"}">
+                  ${order.risk_checks.inside_allowlist ? "allowlist" : "blocked"}
+                </span>
+                <h3>${escapeHtml(order.side.toUpperCase())} ${escapeHtml(order.trading_pair)}</h3>
+                <p class="muted">${escapeHtml(order.client_order_id)}</p>
+              </div>
+              <div class="terminal-ticket-grid">
+                ${kv("类型", order.order_type)}
+                ${kv("名义金额", order.notional_quote)}
+                ${kv("估算价格", order.estimated_price)}
+                ${kv("估算数量", order.estimated_quantity)}
+                ${kv("信号时间", shortTimestamp(order.signal_timestamp))}
+                ${kv("Momentum", order.signal_momentum)}
+              </div>
+            </article>
+          `,
+        )
+        .join("")}
+    </div>
+  `;
+}
+
+function renderTerminalChecklist(rows: {item_id: string; title: string; status: string; details: string}[]): string {
+  return `
+    <div class="terminal-checklist">
+      ${rows
+        .map(
+          (row) => `
+            <span>
+              <strong>${escapeHtml(row.status)}</strong>
+              ${escapeHtml(row.title)}
+            </span>
+          `,
+        )
+        .join("")}
+    </div>
+  `;
+}
+
+function renderKeyValueEntries(entries: Record<string, string | number | boolean>): string {
+  const rows = Object.entries(entries);
+  if (!rows.length) {
+    return `<p class="muted">暂无风控摘要。</p>`;
+  }
+  return `<div class="terminal-kv-list">${rows.map(([key, value]) => kv(key, String(value))).join("")}</div>`;
+}
+
+function renderRiskChecks(entries: Record<string, string | number | boolean | string[]>): string {
+  const visible = Object.entries(entries).filter(([, value]) => typeof value === "boolean" || Array.isArray(value));
+  if (!visible.length) {
+    return "";
+  }
+  return `
+    <div class="terminal-checklist">
+      ${visible
+        .map(([key, value]) => `<span><strong>${escapeHtml(key)}</strong>${escapeHtml(Array.isArray(value) ? value.join(", ") || "[]" : String(value))}</span>`)
+        .join("")}
+    </div>
+  `;
+}
+
+function renderOperationalChecks(entries: Record<string, string | number | boolean>): string {
+  const rows = Object.entries(entries);
+  if (!rows.length) {
+    return "";
+  }
+  return `<div class="terminal-checklist">${rows.map(([key, value]) => `<span><strong>${escapeHtml(key)}</strong>${escapeHtml(String(value))}</span>`).join("")}</div>`;
+}
+
+function renderTerminalBlockers(blockers: TerminalBlocker[]): string {
+  if (!blockers.length) {
+    return `<p class="muted">当前没有终端阻断项。</p>`;
+  }
+  return `
+    <div class="terminal-blockers">
+      ${blockers
+        .map(
+          (blocker) => `
+            <article class="terminal-blocker ${terminalSeverityClass(blocker.severity)}">
+              <span class="badge ${terminalSeverityClass(blocker.severity)}">${escapeHtml(blocker.severity)}</span>
+              <div>
+                <strong>${escapeHtml(blocker.title)}</strong>
+                <p>${escapeHtml(blocker.message)}</p>
+                <small>${escapeHtml(blocker.source)}</small>
+              </div>
+            </article>
+          `,
+        )
+        .join("")}
+    </div>
+  `;
+}
+
+function renderTerminalActions(current: AppState): string {
+  return `
+    <div class="terminal-action-list">
+      ${current.tradingTerminal.actions
+        .map((action) => {
+          const activeJob = activeJobForAction(current.jobs, action.action_id);
+          return `
+            <article class="terminal-action">
+              <div>
+                <strong>${escapeHtml(action.label)}</strong>
+                <small>${escapeHtml(action.safety_level)} · ${escapeHtml(action.description)}</small>
+                ${action.blocked_reason ? `<p class="blocked-note">${escapeHtml(action.blocked_reason)}</p>` : ""}
+                ${activeJob ? `<p class="running-note">运行中：${escapeHtml(activeJob.job_id)}</p>` : ""}
+              </div>
+              <button
+                class="action-submit"
+                type="button"
+                data-terminal-action-id="${escapeHtml(action.action_id)}"
+                ${action.enabled && !activeJob ? "" : "disabled"}
+              >
+                ${action.enabled ? "准备执行" : "已阻断"}
+              </button>
+            </article>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
+function renderTerminalConfirmation(current: AppState): string {
+  const confirmation = current.pendingConfirmation;
+  if (!confirmation || confirmation.stepId !== "terminal") {
+    return "";
+  }
+  const action = current.tradingTerminal.actions.find((item) => item.action_id === confirmation.actionId);
+  if (!action) {
+    return "";
+  }
+  return `
+    <section class="confirmation-panel terminal-confirmation">
+      <h3>确认终端安全动作</h3>
+      <p class="muted">${escapeHtml(action.description)}</p>
+      <div class="decision-band">
+        ${kv("action", action.action_id)}
+        ${kv("safety", action.safety_level)}
+      </div>
+      <div class="confirmation-actions">
+        <button class="action-submit" type="button" data-confirm-action-id="${escapeHtml(action.action_id)}">确认执行</button>
+        <button class="secondary-button" type="button" data-cancel-confirm>取消</button>
+      </div>
     </section>
   `;
 }
@@ -3886,6 +4403,22 @@ function selectedStep(current: AppState): WorkflowStep {
   );
 }
 
+function currentRoute(): "terminal" | "workflow" {
+  const path = window.location.pathname.replace(/\/+$/, "");
+  return path.endsWith("/workflow") ? "workflow" : "terminal";
+}
+
+function pageHref(page: "terminal" | "workflow"): string {
+  const path = window.location.pathname.replace(/\/+$/, "");
+  if (path.endsWith("/app")) {
+    return page === "terminal" ? "/app/terminal" : "/app/workflow";
+  }
+  if (path.startsWith("/app/")) {
+    return page === "terminal" ? "/app/terminal" : "/app/workflow";
+  }
+  return page === "terminal" ? "/terminal" : "/workflow";
+}
+
 function latestStepJob(step: WorkflowStep): JobSummary | null {
   const jobs = step.actions
     .map((action) => action.latest_job)
@@ -3949,6 +4482,19 @@ function badgeClass(status: string): string {
   if (status === "completed") return "success";
   if (status === "active") return "warning";
   if (status === "attention_required") return "danger";
+  return "neutral";
+}
+
+function terminalModeClass(status: string): string {
+  if (status === "LIVE_BLOCKED") return "danger";
+  if (status === "READY_FOR_MANUAL_REVIEW") return "warning";
+  if (status === "PAPER_OBSERVING") return "success";
+  return "neutral";
+}
+
+function terminalSeverityClass(severity: string): string {
+  if (severity === "CRITICAL") return "danger";
+  if (severity === "WARN") return "warning";
   return "neutral";
 }
 

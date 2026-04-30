@@ -18,6 +18,7 @@ live order submission。
 - `GET /api/deployment/status`
 - `GET /api/state-db/status`
 - `GET /api/system/status`
+- `GET /api/trading-terminal`
 - `GET /api/strategy-configs`
 - `GET /api/strategy-configs/{strategy_id}/{file_name}`
 - `POST /api/strategy-configs/{strategy_id}/{file_name}`
@@ -424,6 +425,22 @@ Hummingbot paper event JSONL：
 - `data/reports/`
 - `data/samples/`
 
+交易终端聚合接口：
+
+- `GET /api/trading-terminal` 返回前端默认交易终端所需的单一聚合 payload
+- 数据来源包括 system status、Live readiness summary、Hummingbot paper status、Phase 6.5
+  candidate package、Phase 6.7 post-trade report 和 Phase 6.9 initial closure report
+- payload 固定返回 `live_runner_exposed=false`、`live_order_submission_exposed=false` 和
+  `web_can_submit_live_order=false`
+- `mode.status` 用于一屏提示当前操作状态：`LIVE_BLOCKED`、`LIVE_REVIEW_ONLY`、
+  `PAPER_OBSERVING` 或 `READY_FOR_MANUAL_REVIEW`
+- `candidate_orders` 只展示候选订单审批票据，包括交易对、方向、名义金额、估算价格、估算数量和
+  allowlist / notional 风控摘要
+- `blockers` 聚合 live disabled、kill switch、cooldown、runner disarm、readiness blocker、
+  post-trade warning 和 initial closure warning
+- `actions` 只列出安全动作：生成 Live 执行申请包、Post-trade 复盘、冷却复盘、初始闭环报告和仓位退出计划；
+  `run_live_batch` 会显示为 disabled
+
 ## Frontend
 
 ```bash
@@ -438,7 +455,28 @@ npm run dev
 VITE_API_BASE_URL=http://127.0.0.1:8000 npm run dev
 ```
 
-当前页面展示：
+前端提供两个独立页面：
+
+- `/terminal`：交易终端；默认 `/` 也进入交易终端
+- `/workflow`：流程台
+
+- `交易终端` 用于查看账户、策略、持仓、候选订单、风控、阻断原因、执行对账和安全动作
+- `流程台` 用于研究、回测、Paper、Hummingbot sandbox、Live 准入、报告、复盘和证据追溯
+- 交易终端可启动的动作仍走 `POST /api/jobs/{action_id}`，并保留同 action 活跃任务保护
+- 交易终端不提供实盘下单按钮；Live runner 和 live order submission 始终保持 Web 阻断
+
+交易终端展示：
+
+- 当前模式、下一次 live decision 和最后刷新时间
+- `LIVE_TRADING_ENABLED`、`GLOBAL_KILL_SWITCH`、Live Runner、Order Submit、Runner Disarmed 和 Alert Channel
+- 账户、connector、market type、策略、allowlist、selected pairs 和最新信号时间
+- 当前持仓、净 BTC 数量、成本、入场均价、持仓计划和是否需要退出审批
+- Phase 6.5 候选订单审批票据，不显示“立即下单”
+- 风控限制、allowlist、cooldown 和阻断项
+- Phase 6.7 执行与对账结果，包括 submitted/filled/db fills、成交金额、净入账和 runner 状态
+- 安全动作入口：生成执行申请包、post-trade 复盘、冷却复盘、初始闭环报告和仓位退出计划
+
+流程台展示：
 
 - v0 当前版本定位
 - 端到端业务流程阶段
